@@ -26,7 +26,7 @@ if [ -n "$MISSING_VARS" ]; then
 fi
 
 ### Iterate through templates copied to container
-for templateFilename in "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/*.docker.*"; do
+for templateFilename in $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/*.docker.*; do
   echo "Info: Found template $templateFilename";
   filename="${templateFilename//.docker/}";
   echo "Info: Using template $templateFilename for file $filename";
