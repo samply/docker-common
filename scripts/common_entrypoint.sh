@@ -26,7 +26,7 @@ if [ -n "$MISSING_VARS" ]; then
 fi
 
 ### Iterate through templates copied to container
-for templateFilename in /tmp/*.docker.*; do
+for templateFilename in "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/conf/*.docker.*"; do
   echo "Info: Found template $templateFilename";
   filename="${templateFilename//.docker/}";
   echo "Info: Using template $templateFilename for file $filename";
@@ -34,7 +34,5 @@ for templateFilename in /tmp/*.docker.*; do
     echo "Info: Updating value of environment variable $var";
     sed -i "s|$var|${!var}|g" "$templateFilename";
   done
-  echo "$(whoami)"
-  echo "$(ls -l $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/)"
-  cp -f "$templateFilename" "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/${filename//\/tmp\//}";
+  cp -f "$templateFilename" "${filename}";
 done
