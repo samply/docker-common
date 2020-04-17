@@ -14,7 +14,7 @@ MISSING_VARS=""
 
 ## Check for missing variables
 echo "Info: Checking if all mandatory variables are specified"
-for VAR in $MANDATORY_VARS; do
+for VAR in $MANDATORY_VARIABLES; do
   if [ -z "${!VAR}" ]; then
     MISSING_VARS+="$VAR "
   fi
@@ -26,7 +26,7 @@ if [ -n "$MISSING_VARS" ]; then
 fi
 
 ### Iterate through templates copied to container
-for templateFilename in "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/conf/*.docker.*"; do
+for templateFilename in "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/*.docker.*"; do
   echo "Info: Found template $templateFilename";
   filename="${templateFilename//.docker/}";
   echo "Info: Using template $templateFilename for file $filename";
