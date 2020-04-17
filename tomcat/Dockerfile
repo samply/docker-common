@@ -8,6 +8,9 @@ ENV COMPONENT=$COMPONENT
 ARG DEPLOYMENT_CONTEXT="ROOT"
 ENV DEPLOYMENT_CONTEXT=$DEPLOYMENT_CONTEXT
 
+ARG CONFIG_FILES_URN="./config"
+ENV CONFIG_FILES_URN=$CONFIG_FILES_URN
+
 ARG MANDATORY_VARIABLES=""
 ENV MANDATORY_VARIABLES=$MANDATORY_VARIABLES
 
@@ -25,7 +28,7 @@ RUN apt-get update -y && apt-get install -y dos2unix && apt-get clean && \
     find /scripts/ -type f -print0 | xargs -0 dos2unix && \
     apt-get remove -y dos2unix
 ### TODO: Possibility for additional config file loaded from other source than docker.common CONFIG_URN???
-ADD ./config/*.docker.* /tmp/
+ADD $CONFIG_FILES_URN/*.docker.*  /tmp/
 
 ### Change to user with only www-data permissions
 RUN set -x ; \
