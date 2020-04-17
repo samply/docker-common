@@ -8,9 +8,6 @@ ENV COMPONENT=$COMPONENT
 ARG DEPLOYMENT_CONTEXT="ROOT"
 ENV DEPLOYMENT_CONTEXT=$DEPLOYMENT_CONTEXT
 
-ARG ARTIFACT_URN="https://tomcat.apache.org/tomcat-7.0-doc/appdev/sample/sample.war"
-ENV ARTIFACT_URN=$ARTIFACT_URN
-
 ARG MANDATORY_VARIABLES=""
 ENV MANDATORY_VARIABLES=$MANDATORY_VARIABLES
 
@@ -18,8 +15,10 @@ ARG COMMON_REPOSITORY_URL=https://bitbucket.org/brennert/docker.common
 ARG COMMIT_HASH=56ee08acc8fded11f8dda050124ef4e8b7107aa6
 
 ### Extract ARTIFACT to DEPLOYMENT_CONTEXT
-ADD $ARTIFACT_URN $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT.war
-RUN cd $CATALINA_HOME/webapps/ && set ARTIFACT_SHA512=$(sha512sum ./$DEPLOYMENT_CONTEXT.war) && mkdir $DEPLOYMENT_CONTEXT && cd $DEPLOYMENT_CONTEXT && jar xvf ../$DEPLOYMENT_CONTEXT.war
+COPY ./*.war $CATALINA_HOME/webapps/
+RUN cd $CATALINA_HOME/webapps/ && mv *.war $DEPLOYMENT_CONTEXT.war && \
+    set ARTIFACT_SHA512=$(sha512sum ./$DEPLOYMENT_CONTEXT.war) && \ 
+    mkdir $DEPLOYMENT_CONTEXT && cd $DEPLOYMENT_CONTEXT && jar xvf ../$DEPLOYMENT_CONTEXT.war
 
 ### TODO: make this link dynamic --> $REPOSITORY_URL and $COMMIT_HASH?
 ### ADD scripts that will be run on container startup
