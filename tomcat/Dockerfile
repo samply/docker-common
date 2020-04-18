@@ -20,7 +20,6 @@ RUN cd $CATALINA_HOME/webapps/ && mv *.war $DEPLOYMENT_CONTEXT.war && \
     set ARTIFACT_SHA512=$(sha512sum ./$DEPLOYMENT_CONTEXT.war) && \ 
     mkdir $DEPLOYMENT_CONTEXT && cd $DEPLOYMENT_CONTEXT && jar xvf ../$DEPLOYMENT_CONTEXT.war
 
-### TODO: make this link dynamic --> $REPOSITORY_URL and $COMMIT_HASH?
 ### ADD scripts that will be run on container startup
 ADD $COMMON_REPOSITORY_URL/raw/$COMMIT_HASH/tomcat/scripts/tomcat_entrypoint.sh /scripts/
 ADD $COMMON_REPOSITORY_URL/raw/$COMMIT_HASH/scripts/common_entrypoint.sh /scripts/
