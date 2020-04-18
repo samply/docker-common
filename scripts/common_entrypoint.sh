@@ -26,13 +26,16 @@ if [ -n "$MISSING_VARS" ]; then
 fi
 
 ### Iterate through templates copied to container
-for templateFilename in $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/*.docker.*; do
-  echo "Info: Found template $templateFilename";
-  filename="${templateFilename//.docker/}";
-  echo "Info: Using template $templateFilename for file $filename";
-  for var in $(compgen -e | grep "$COMPONENT"); do
-    echo "Info: Updating value of environment variable $var";
-    sed -i "s|$var|${!var}|g" "$templateFilename";
-  done
-  cp -f "$templateFilename" "${filename}";
+echo "Info: Checking for config template files in $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/"
+for templateFilename in $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/*; do
+  if [[ $templateFilename == *".docker."* ]]; then
+    echo "Info: Found template $templateFilename";
+    filename="${templateFilename//.docker/}";
+    echo "Info: Using template $templateFilename for file $filename";
+    for var in $(compgen -e | grep "$COMPONENT"); do
+      echo "Info: Updating value of environment variable $var";
+      sed -i "s|$var|${!var}|g" "$templateFilename";
+    done
+    cp -f "$templateFilename" "${filename}";
+  fi
 done
