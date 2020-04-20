@@ -1,4 +1,5 @@
 #!/bin/bash -e
+COMMON_REPOSITORY="https://bitbucket.org/brennert/docker.common";
 COMMON_REPOSITORY_COMMIT="1a76e2dd03f1816cf4c7007d991e14d9eb700e8b";
 MAVEN_HOME="maven-home";
 BUILDER="none";
@@ -29,7 +30,7 @@ if [ -z "$COMPONENT" ] || [ -z "$COMPONENT_REPOSITORY" ]; then
 fi
 ### Build artifacts of component for final docker image
 if [ $BUILDER != "none" ]; then
-  docker build -t $COMPONENT-builder --build-arg COMPONENT=$COMPONENT -f- $COMPONENT_REPOSITORY < ./$BUILDER/Dockerfile;
+  $(curl $COMMON_REPOSITORY/raw/$COMMON_REPOSITORY_COMMIT/$BUILDER/Dockerfile) | docker build -t $COMPONENT-builder --build-arg COMPONENT=$COMPONENT -f - $COMPONENT_REPOSITORY
   if [ -d "$(pwd)/artifacts" ]; then
     rm -r artifacts;
   fi
@@ -41,5 +42,5 @@ if [ ! -d "$(pwd)/artifacts" ]; then
   echo "Note: currently no other location than $(pwd)/artifacts/ is supported";
   exit 1;
 fi
-docker build -t $COMPONENT:wip --build-arg COMPONENT=$COMPONENT --build-arg COMMIT_HASH=$COMMON_REPOSITORY_COMMIT -f- $(pwd)/artifacts/ < ./tomcat/Dockerfile;
+curl $COMMON_REPOSITORY/raw/$COMMON_REPOSITORY_COMMIT/tomcat/Dockerfile | docker build -t $COMPONENT:wip --build-arg COMPONENT=$COMPONENT --build-arg COMMIT_HASH=$COMMON_REPOSITORY_COMMIT -f - $(pwd)/artifacts/
 exit 0;
