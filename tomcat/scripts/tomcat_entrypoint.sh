@@ -1,16 +1,36 @@
 #!/bin/bash -e
 source /scripts/common_entrypoint.sh
 ### Configure tomcat
-## Default environment variables:
-: "${TOMCAT_REVERSEPROXY_FQDN:=$FQDN}"
-: "${TOMCAT_REVERSEPROXY_PORT:=8080}"
+## default environment
 : "${TOMCAT_REVERSEPROXY_SSL:=false}"
-
 ## Reverse proxy configuration
-sed -e "s|TOMCAT_REVERSEPROXY_FQDN|$TOMCAT_REVERSEPROXY_FQDN|g ; \
-	s|TOMCAT_REVERSEPROXY_PORT|$TOMCAT_REVERSEPROXY_PORT|g ; \
-	s|TOMCAT_REVERSEPROXY_SSL|$TOMCAT_REVERSEPROXY_SSL|g" \
-	/usr/local/tomcat/conf/server.docker.xml > /usr/local/tomcat/conf/server.xml;
+
+if [ -n "$TOMCAT_REVERSEPROXY_FQDN" ]; then
+  echo "Info: Configuring reverse proxy for URL $TOMCAT_REVERSEPROXY_FQDN";
+  mv server.xml server.xml.ori;
+  ## Apply add reversproxy configuration to
+  echo "Info: applying $CATALINA_HOME/conf/server.reverseproxy.patch on $CATALINA_HOME/conf/server.xml"
+  patch -i $CATALINA_HOME/conf/server.reverseproxy.patch -o $CATALINA_HOME/conf/server.xml $CATALINA_HOME/conf/server.xml.ori
+  if [ -z "$TOMCAT_REVERSEPROXY_PORT" ]; then
+	  case "$TOMCAT_REVERSEPROXY_SSL" in
+	  	true)
+	  		TOMCAT_REVERSEPROXY_PORT=443
+	  		;;
+	  	false)
+	  		TOMCAT_REVERSEPROXY_PORT=80
+	  		;;
+	  	*)
+	  		echo "Error: Please set TOMCAT_REVERSEPROXY_SSL to either true or false."
+	  		exit 1
+	  esac
+  fi
+  echo "Info: Applying configuration for ReverseProxy with settings: TOMCAT_REVERSEPROXY_FQDN=$TOMCAT_REVERSEPROXY_FQDN TOMCAT_REVERSEPROXY_PORT=$TOMCAT_REVERSEPROXY_PORT TOMCAT_REVERSEPROXY_SSL=$TOMCAT_REVERSEPROXY_SSL"
+  sed -i -e "s|TOMCAT_REVERSEPROXY_FQDN|$TOMCAT_REVERSEPROXY_FQDN|g ; \
+  	s|TOMCAT_REVERSEPROXY_PORT|$TOMCAT_REVERSEPROXY_PORT|g ; \
+  	s|TOMCAT_REVERSEPROXY_SSL|$TOMCAT_REVERSEPROXY_SSL|g" \
+  	$CATALINA_HOME/conf/server.xml;
+  echo "Info: ReverseProxy configuration is finished"
+fi
 
 if [ "$DEBUG" = 'true' ]; then
   ## Starting tomcat in remote debug mode

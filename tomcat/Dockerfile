@@ -27,7 +27,7 @@ RUN cd $CATALINA_HOME/webapps/ && mv *.war $DEPLOYMENT_CONTEXT.war && \
 ADD $COMMON_REPOSITORY_URN/tomcat/scripts/tomcat_entrypoint.sh /scripts/
 ADD $COMMON_REPOSITORY_URN/scripts/common_entrypoint.sh /scripts/
 ### ADD config files for tomcat configuration. These files will be processed in tomcat_entrypoint.sh
-ADD $COMMON_REPOSITORY_URN/tomcat/config/server.docker.xml $CATALINA_HOME/conf/
+ADD $COMMON_REPOSITORY_URN/tomcat/config/server.reverseproxy.patch $CATALINA_HOME/conf/
 
 ### Run dos2unix to prevent issues from windows files
 RUN apt-get update -y && apt-get install -y dos2unix && apt-get clean && \
