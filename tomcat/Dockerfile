@@ -5,14 +5,17 @@ MAINTAINER Torben Brenner "t.brenner@dkfz-heidelberg.de"
 ARG COMPONENT="test"
 ENV COMPONENT=$COMPONENT
 
+### TODO: This should only be an environment variable
 ARG DEPLOYMENT_CONTEXT="ROOT"
 ENV DEPLOYMENT_CONTEXT=$DEPLOYMENT_CONTEXT
 
+### Parameter for user defined mandatory variables. The tomcat image itself should have no mandatory variables.
 ARG MANDATORY_VARIABLES=""
 ENV MANDATORY_VARIABLES=$MANDATORY_VARIABLES
 
-ARG COMMON_REPOSITORY_URL=https://bitbucket.org/brennert/docker.common
-ARG COMMIT_HASH=56ee08acc8fded11f8dda050124ef4e8b7107aa6
+### This either can be specified to local directory, or for use in components as url to raw files: e.g.: https://bitbucket.org/brennert/docker.common/raw/9b8f6b559076a97caec544f7e65f9a2433be5d65
+ARG COMMON_REPOSITORY_URN=$(pwd)
+ENV COMMON_REPOSITORY_URN=$COMMON_REPOSITORY_URN
 
 ### Extract ARTIFACT to DEPLOYMENT_CONTEXT
 COPY ./*.war $CATALINA_HOME/webapps/
@@ -21,10 +24,10 @@ RUN cd $CATALINA_HOME/webapps/ && mv *.war $DEPLOYMENT_CONTEXT.war && \
     mkdir $DEPLOYMENT_CONTEXT && cd $DEPLOYMENT_CONTEXT && jar xvf ../$DEPLOYMENT_CONTEXT.war
 
 ### ADD scripts that will be run on container startup
-ADD $COMMON_REPOSITORY_URL/raw/$COMMIT_HASH/tomcat/scripts/tomcat_entrypoint.sh /scripts/
-ADD $COMMON_REPOSITORY_URL/raw/$COMMIT_HASH/scripts/common_entrypoint.sh /scripts/
+ADD $COMMON_REPOSITORY_URN/tomcat/scripts/tomcat_entrypoint.sh /scripts/
+ADD $COMMON_REPOSITORY_URN/scripts/common_entrypoint.sh /scripts/
 ### ADD config files for tomcat configuration. These files will be processed in tomcat_entrypoint.sh
-ADD $COMMON_REPOSITORY_URL/raw/$COMMIT_HASH/tomcat/config/server.docker.xml $CATALINA_HOME/conf/
+ADD $COMMON_REPOSITORY_URN/tomcat/config/server.docker.xml $CATALINA_HOME/conf/
 
 ### Run dos2unix to prevent issues from windows files
 RUN apt-get update -y && apt-get install -y dos2unix && apt-get clean && \
