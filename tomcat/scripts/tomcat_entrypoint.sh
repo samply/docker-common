@@ -7,7 +7,7 @@ source /scripts/common_entrypoint.sh
 
 if [ -n "$TOMCAT_REVERSEPROXY_FQDN" ]; then
   echo "Info: Configuring reverse proxy for URL $TOMCAT_REVERSEPROXY_FQDN";
-  mv server.xml server.xml.ori;
+  mv $CATALINA_HOME/conf/server.xml $CATALINA_HOME/conf/server.xml.ori;
   ## Apply add reversproxy configuration to
   echo "Info: applying $CATALINA_HOME/conf/server.reverseproxy.patch on $CATALINA_HOME/conf/server.xml"
   patch -i $CATALINA_HOME/conf/server.reverseproxy.patch -o $CATALINA_HOME/conf/server.xml $CATALINA_HOME/conf/server.xml.ori
