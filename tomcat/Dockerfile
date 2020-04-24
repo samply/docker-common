@@ -30,7 +30,7 @@ ADD $COMMON_REPOSITORY_URN/scripts/common_entrypoint.sh /scripts/
 ADD $COMMON_REPOSITORY_URN/tomcat/config/server.reverseproxy.patch $CATALINA_HOME/conf/
 
 ### Run dos2unix to prevent issues from windows files
-RUN apt-get update -y && apt-get install -y dos2unix && apt-get clean && \
+RUN apt-get update -y && apt-get install -y dos2unix patch && apt-get clean && \
     find /scripts/ -type f -print0 | xargs -0 dos2unix && \
     find $CATALINA_HOME/conf/ -type f -print0 | xargs -0 dos2unix && \
     apt-get remove -y dos2unix
