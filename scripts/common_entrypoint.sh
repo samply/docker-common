@@ -2,7 +2,7 @@
 echo "Info: executing common_entrypoint.sh";
 ### TODO: How can users of docker common specify default values?
 ### Process docker secrets
-for var in $(compgen -e | grep "$COMPONENT"); do
+for var in $(compgen -e | grep -i "$COMPONENT"); do
   echo "Info: Checking secret ${!var}_FILE for environment variable $var"
   if [ -e "/run/secrets/${!var}_FILE" ]; then \
     echo "Info: secret found for ${!var}_FILE. Now writing value back to $var";
@@ -32,7 +32,7 @@ for templateFilename in $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/class
     echo "Info: Found template $templateFilename";
     filename="${templateFilename//.docker/}";
     echo "Info: Using template $templateFilename for file $filename";
-    for var in $(compgen -e | grep "$COMPONENT"); do
+    for var in $(compgen -e | grep -i "$COMPONENT"); do
       echo "Info: Updating value of environment variable $var";
       sed -i "s|$var|${!var}|g" "$templateFilename";
     done
