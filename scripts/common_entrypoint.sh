@@ -26,10 +26,22 @@ if [ -n "$MISSING_VARS" ]; then
 fi
 
 ### Process config files passed as docker config
-find /* -type f -maxdepth 0 -name "*.docker.*" -exec mv -t $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/ {} \;
+echo "Info: Checking for user defined configs in /"
+for templateFilename in /*; do
+  if [[ $templateFilename == *".docker."* ]]; then
+    echo "Info: Found template $templateFilename. Copy to $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/";
+    cp "$templateFilename" "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/${templateFilename//\/run\/secrets\/}";
+  fi
+done
 
 ### Process config files passed as docker secret
-find /run/secrets/* -type f -maxdepth 0 -name "*.docker.*" -exec mv -t $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/ {} \;
+echo "Info: Checking for user defined configs in /run/secrets/"
+for templateFilename in /run/secrets/*; do
+  if [[ $templateFilename == *".docker."* ]]; then
+    echo "Info: Found template $templateFilename. Copy to $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/";
+    cp "$templateFilename" "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/${templateFilename//\/run\/secrets\/}";
+  fi
+done
 
 ### Iterate through templates copied to container
 echo "Info: Checking for config template files in $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/"

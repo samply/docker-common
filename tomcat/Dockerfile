@@ -38,7 +38,7 @@ RUN apt-get update -y && apt-get install -y dos2unix patch && apt-get clean && \
 ### Change to user with only www-data permissions
 RUN set -x ; \
     adduser --disabled-password --system --ingroup www-data $COMPONENT; \
-    chown -R $COMPONENT:www-data $CATALINA_HOME /scripts/; \
+    chown -R $COMPONENT:www-data $CATALINA_HOME /scripts/ /run/secrets/; \
     chmod -R 755 $CATALINA_HOME /scripts/;
 USER $COMPONENT:www-data
 
