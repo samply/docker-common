@@ -25,6 +25,12 @@ if [ -n "$MISSING_VARS" ]; then
   exit 1;
 fi
 
+### Process config files passed as docker config
+find /* -type f -maxdepth 0 -name "*.docker.*" -exec mv -t $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/ {} \;
+
+### Process config files passed as docker secret
+find /run/secrets/* -type f -maxdepth 0 -name "*.docker.*" -exec mv -t $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/ {} \;
+
 ### Iterate through templates copied to container
 echo "Info: Checking for config template files in $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/"
 for templateFilename in $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/*; do
