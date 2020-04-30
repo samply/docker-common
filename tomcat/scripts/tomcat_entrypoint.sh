@@ -14,6 +14,12 @@ if [ -n "$DEPLOYMENT_CONTEXT" ]; then
   fi
   mkdir -p "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT";
   mv "$CATALINA_HOME/webapps/ROOT/"* "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT";
+  if [ ! -d "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/META-INF" ]; then
+    echo "Info: creating META-INF directory in deployment context";
+    mkdir "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/META-INF";
+  fi
+  echo "<Context docBase=\"/$DEPLOYMENT_CONTEXT\" crossContext=\"true\" />" > \
+  "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/META-INF/context.xml"
 fi
 
 if [ -n "$TOMCAT_REVERSEPROXY_FQDN" ]; then
