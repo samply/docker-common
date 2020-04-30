@@ -5,10 +5,6 @@ MAINTAINER Torben Brenner "t.brenner@dkfz-heidelberg.de"
 ARG COMPONENT="test"
 ENV COMPONENT=$COMPONENT
 
-### TODO: This should only be an environment variable
-ARG DEPLOYMENT_CONTEXT="ROOT"
-ENV DEPLOYMENT_CONTEXT=$DEPLOYMENT_CONTEXT
-
 ### Parameter for user defined mandatory variables. The tomcat image itself should have no mandatory variables.
 ARG MANDATORY_VARIABLES=""
 ENV MANDATORY_VARIABLES=$MANDATORY_VARIABLES
@@ -17,11 +13,14 @@ ENV MANDATORY_VARIABLES=$MANDATORY_VARIABLES
 ARG COMMON_REPOSITORY_URN=$(pwd)
 ENV COMMON_REPOSITORY_URN=$COMMON_REPOSITORY_URN
 
-### Extract ARTIFACT to DEPLOYMENT_CONTEXT
+### Checksum of the Deployed Artifact
+ENV ARTIFACT_SHA512=""
+### Extract ARTIFACT to ROOT
+### TODO: Support for already extracted artifact
 COPY ./*.war $CATALINA_HOME/webapps/
-RUN cd $CATALINA_HOME/webapps/ && mv *.war $DEPLOYMENT_CONTEXT.war && \
-    set ARTIFACT_SHA512=$(sha512sum ./$DEPLOYMENT_CONTEXT.war) && \ 
-    mkdir $DEPLOYMENT_CONTEXT && cd $DEPLOYMENT_CONTEXT && jar xvf ../$DEPLOYMENT_CONTEXT.war
+RUN cd $CATALINA_HOME/webapps/ && mv *.war ROOT.war && \
+    set ARTIFACT_SHA512=$(sha512sum ./ROOT.war) && \
+    mkdir ROOT && cd ROOT && jar xvf ../ROOT.war && rm ../ROOT.war
 
 ### ADD scripts that will be run on container startup
 ADD $COMMON_REPOSITORY_URN/tomcat/scripts/tomcat_entrypoint.sh /scripts/

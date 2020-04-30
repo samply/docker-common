@@ -5,6 +5,17 @@ source /scripts/common_entrypoint.sh
 : "${TOMCAT_REVERSEPROXY_SSL:=false}"
 ## Reverse proxy configuration
 
+### Move files from ROOT to a different deployment context
+if [ -n "$DEPLOYMENT_CONTEXT" ]; then
+  echo "Info: Changing deployment context of application from ROOT to $DEPLOYMENT_CONTEXT";
+  if [ -d "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT" ]; then
+    echo "Error: The directory $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT already exists. Aborting startup!";
+    exit 17;
+  fi
+  mkdir -p "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT";
+  mv "$CATALINA_HOME/webapps/ROOT/" "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT";
+fi
+
 if [ -n "$TOMCAT_REVERSEPROXY_FQDN" ]; then
   echo "Info: Configuring reverse proxy for URL $TOMCAT_REVERSEPROXY_FQDN";
   mv $CATALINA_HOME/conf/server.xml $CATALINA_HOME/conf/server.xml.ori;
