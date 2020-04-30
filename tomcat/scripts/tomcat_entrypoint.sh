@@ -13,7 +13,7 @@ if [ -n "$DEPLOYMENT_CONTEXT" ]; then
     exit 17;
   fi
   mkdir -p "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT";
-  mv "$CATALINA_HOME/webapps/ROOT/" "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT";
+  mv "$CATALINA_HOME/webapps/ROOT/"* "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT";
 fi
 
 if [ -n "$TOMCAT_REVERSEPROXY_FQDN" ]; then
