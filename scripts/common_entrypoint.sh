@@ -29,8 +29,8 @@ fi
 echo "Info: Checking for user defined configs in /"
 for templateFilename in /*; do
   if [[ $templateFilename == *".docker."* ]]; then
-    echo "Info: Found template $templateFilename. Copy to $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/";
-    cp "$templateFilename" "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/${templateFilename//\/run\/secrets\/}";
+    echo "Info: Found template $templateFilename. Copy to $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/";
+    cp "$templateFilename" "$CATALINA_HOME/webapps/ROOT/WEB-INF/classes/${templateFilename//\/run\/secrets\/}";
   fi
 done
 
@@ -38,14 +38,14 @@ done
 echo "Info: Checking for user defined configs in /run/secrets/"
 for templateFilename in /run/secrets/*; do
   if [[ $templateFilename == *".docker."* ]]; then
-    echo "Info: Found template $templateFilename. Copy to $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/";
-    cp "$templateFilename" "$CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/${templateFilename//\/run\/secrets\/}";
+    echo "Info: Found template $templateFilename. Copy to $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/";
+    cp "$templateFilename" "$CATALINA_HOME/webapps/ROOT/WEB-INF/classes/${templateFilename//\/run\/secrets\/}";
   fi
 done
 
 ### Iterate through templates copied to container
-echo "Info: Checking for config template files in $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/"
-for templateFilename in $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT/WEB-INF/classes/*; do
+echo "Info: Checking for config template files in $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/"
+for templateFilename in $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/*; do
   if [[ $templateFilename == *".docker."* ]]; then
     echo "Info: Found template $templateFilename";
     filename="${templateFilename//.docker/}";
