@@ -15,17 +15,10 @@ ARG COMMON_REPOSITORY_VERSION=develop
 LABEL docker.common.version="$COMMON_REPOSITORY_VERSION"
 
 ### ADD scripts that will run on container startup
-ADD https://bitbucket.org/brennert/docker.common/get/${COMMON_REPOSITORY_VERSION}.tar.gz /tmp/common-repository.tar.gz
-RUN tar -xvf /tmp/common-repository.tar.gz -C /tmp/ && \
-    mv /tmp/*-docker.common-* /tmp/common-repository && \
-    mkdir /scripts && \
-    ### Add scripts that wil run on startup
-    cp /tmp/common-repository/tomcat/scripts/tomcat_entrypoint.sh /scripts/ && \
-    cp /tmp/common-repository/scripts/common_entrypoint.sh /scripts/ && \
-    ### ADD config files for tomcat configuration. These files will be processed in tomcat_entrypoint.sh
-    cp /tmp/common-repository/tomcat/config/server.reverseproxy.patch $CATALINA_HOME/conf/ && \
-    ### Clean up tmp directory after this
-    rm -r /tmp/*
+ADD ./tomcat/scripts/tomcat_entrypoint.sh /scripts/
+ADD ./scripts/common_entrypoint.sh /scripts/
+### ADD config files for tomcat configuration. These files will be processed in tomcat_entrypoint.sh
+ADD ./tomcat/config/server.reverseproxy.patch $CATALINA_HOME/conf/
 
 ### Run dos2unix to prevent issues from windows files
 RUN apt-get update -y && apt-get install -y dos2unix patch && apt-get clean && \
