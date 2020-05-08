@@ -1,4 +1,5 @@
 #!/bin/bash -e
+### Deprecated, will be removed in future commits
 COMMON_REPOSITORY="https://bitbucket.org/brennert/docker.common";
 COMMON_REPOSITORY_COMMIT="1a76e2dd03f1816cf4c7007d991e14d9eb700e8b";
 MAVEN_HOME="maven-home";
