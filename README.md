@@ -35,7 +35,7 @@ docker run -it --rm --name component-build -v /$(pwd)/://usr/src/build/ -w //usr
 
 ### Final Images
 With these images you can build your component image. They need a artifact(e.g. WAR File) from you. You can either generate artifacts yourself or use a Builder from this repository.
-#### tomcat
+#### tomcat - Outdated, needs update
 Use the tomcat image to build the container for your component. This command assumes directory target contains a WAR-File (*.war)
 ```shell script
 curl <common_repository_url>/tomcat/Dockerfile | docker build -t component:latest --build-arg COMPONENT=component --build-arg COMMON_REPOSITORY_URN=<common_repository_url> -f - ./target
