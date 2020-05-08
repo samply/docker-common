@@ -1,0 +1,20 @@
+# This is a sample build configuration for Docker.
+# Check our guides at https://confluence.atlassian.com/x/O1toN for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: atlassian/default-image:2
+
+pipelines:
+  default:
+    - step:
+        services:
+          - docker
+        script: 
+          - export TOMCAT_IMAGE_NAME=torbenbrenner/tomcat.common:latest
+          # build the Docker image (this will use the Dockerfile in the tomcat directory)
+          - docker build -t $TOMCAT_IMAGE_NAME ./tomcat
+          # authenticate with the Docker Hub registry
+          - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+          # push the new Docker image to the Docker registry
+          - docker push $IMAGE_NAME
