@@ -34,11 +34,16 @@ docker run -it --rm --name component-build -v /$(pwd)/://usr/src/build/ -w //usr
 >       -v /$HOME/.m2/://root/.m2
 
 ### Final Images
-With these images you can build your component image. They need a artifact(e.g. WAR File) from you. You can either generate artifacts yourself or use a Builder from this repository.
+With these images you can build your component image. They need a artifact(e.g. an exploded WAR file) from you. You can either generate artifacts yourself or use a builder from this repository.
 #### tomcat - Outdated, needs update
-Use the tomcat image to build the container for your component. This command assumes directory target contains a WAR-File (*.war)
-```shell script
-curl <common_repository_url>/tomcat/Dockerfile | docker build -t component:latest --build-arg COMPONENT=component --build-arg COMMON_REPOSITORY_URN=<common_repository_url> -f - ./target
+The docker common image is available on docker hub at [https://hub.docker.com/r/torbenbrenner/tomcat.common](https://hub.docker.com/r/torbenbrenner/tomcat.common)
+The image defines different onbuild steps, so you can import it and get the full functionality of docker.common.
+You can use it like:
+```Dockerfile
+FROM torbenbrenner/tomcat.common:latest
+### Additional configuration like unpacking a war file (the image normally uses exploded wars)
+# MAINTAINER you
+### You can set default values for your environment variables
 ```
 
 #### Configuration of component image
@@ -70,12 +75,12 @@ services:
   testcomponent:
     image: test-image
     secrets:
-      - ADMIN_USER_NAME_FILE
-      - ADMIN_USER_PASSWORD_FILE
+      - ADMIN_USER_NAME_SECRET
+      - ADMIN_USER_PASSWORD_SECRET
 secrets:
-  ADMIN_USER_NAME_FILE:
+  ADMIN_USER_NAME_SECRET:
     external: true
-  ADMIN_USER_PASSWORD_FILE:
+  ADMIN_USER_PASSWORD_SECRET:
     external: true
 ```
 
