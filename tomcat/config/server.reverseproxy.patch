@@ -8,6 +8,7 @@
 +               redirectPort="8443"
 +               proxyName="TOMCAT_REVERSEPROXY_FQDN"
 +               proxyPort="TOMCAT_REVERSEPROXY_PORT"
++               scheme="TOMCAT_REVERSEPROXY_SCHEME"
 +               secure="TOMCAT_REVERSEPROXY_SSL" />
      <!-- A "Connector" using the shared thread pool-->
      <!--
