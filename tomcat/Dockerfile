@@ -2,36 +2,39 @@ ARG TOMCAT_VERSION="8-jdk8-openjdk-slim"
 FROM tomcat:$TOMCAT_VERSION
 MAINTAINER Torben Brenner "t.brenner@dkfz-heidelberg.de"
 ### Environment Variables need to be set at build time
-ARG COMPONENT="test"
-ENV COMPONENT=$COMPONENT
+### TODO: this needs to be done on build ...
+ONBUILD ARG COMPONENT="test"
+ONBUILD ENV COMPONENT=$COMPONENT
 
-ARG DEPLOYMENT_CONTEXT="ROOT"
-ENV DEPLOYMENT_CONTEXT=$DEPLOYMENT_CONTEXT
+### Parameter for user defined mandatory variables. The tomcat image itself should have no mandatory variables.
+ONBUILD ARG MANDATORY_VARIABLES=""
+ONBUILD ENV MANDATORY_VARIABLES=$MANDATORY_VARIABLES
 
-ARG MANDATORY_VARIABLES=""
-ENV MANDATORY_VARIABLES=$MANDATORY_VARIABLES
+### This will specify the version to use from https://bitbucket.org/brennert/docker.common. This can be any tag, branchname or commit hash
+ARG COMMON_REPOSITORY_VERSION=develop
+LABEL docker.common.version="$COMMON_REPOSITORY_VERSION"
 
-### Args only necessary at build time
-ARG ARTIFACT_URN="https://tomcat.apache.org/tomcat-7.0-doc/appdev/sample/sample.war"
+### ADD scripts that will run on container startup
+ADD ./tomcat/scripts/tomcat_entrypoint.sh /scripts/
+ADD ./scripts/common_entrypoint.sh /scripts/
+### ADD config files for tomcat configuration. These files will be processed in tomcat_entrypoint.sh
+ADD ./tomcat/config/server.reverseproxy.patch $CATALINA_HOME/conf/
 
-### Extract ARTIFACT to DEPLOYMENT_CONTEXT
-ADD $ARTIFACT_URN $CATALINA_HOME/webapps/$DEPLOYMENT_CONTEXT.war
-RUN cd $CATALINA_HOME/webapps/ && set ARTIFACT_SHA512=$(sha512sum ./$DEPLOYMENT_CONTEXT.war) && mkdir $DEPLOYMENT_CONTEXT && cd $DEPLOYMENT_CONTEXT && jar xvf ../$DEPLOYMENT_CONTEXT.war
-
-### ADD additional scripts and config files needed for component configuration
-### TODO: Possibility for additional scripts loaded from other source than docker.common SCRIPTS_URN???
-ADD ./scripts/* /scripts/
-RUN apt-get update -y && apt-get install -y dos2unix && apt-get clean && \
+### Run dos2unix to prevent issues from windows files
+RUN apt-get update -y && apt-get install -y dos2unix patch && apt-get clean && \
     find /scripts/ -type f -print0 | xargs -0 dos2unix && \
+    find $CATALINA_HOME/conf/ -type f -print0 | xargs -0 dos2unix && \
     apt-get remove -y dos2unix
-### TODO: Possibility for additional config file loaded from other source than docker.common CONFIG_URN???
-ADD ./config/*.docker.* /tmp/
+
+### ONBUILD Copy build context to ROOT
+### This will also happen in images that use this image in their FROM instruction
+ONBUILD COPY . $CATALINA_HOME/webapps/ROOT/
 
 ### Change to user with only www-data permissions
-RUN set -x ; \
+ONBUILD RUN set -x ; \
     adduser --disabled-password --system --ingroup www-data $COMPONENT; \
-    chown -R $COMPONENT:www-data $CATALINA_HOME /scripts/ /tmp/; \
-    chmod -R 755 $CATALINA_HOME /scripts/ /tmp/;
-USER $COMPONENT:www-data
+    chown -R $COMPONENT:www-data $CATALINA_HOME /scripts/ /run/secrets/; \
+    chmod -R 755 $CATALINA_HOME /scripts/;
+ONBUILD USER $COMPONENT:www-data
 
 ENTRYPOINT ["/scripts/tomcat_entrypoint.sh"]
