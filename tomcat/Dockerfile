@@ -15,10 +15,8 @@ ARG COMMON_REPOSITORY_VERSION=develop
 LABEL docker.common.version="$COMMON_REPOSITORY_VERSION"
 
 ### ADD scripts that will run on container startup
-ADD ./tomcat/scripts/tomcat_entrypoint.sh ./scripts/common_entrypoint.sh /docker/
-
 ### ADD config files for tomcat configuration. These files will be processed in tomcat_entrypoint.sh
-ADD ./tomcat/config/server.reverseproxy.patch /docker/
+ADD ./tomcat/scripts/tomcat_entrypoint.sh ./tomcat/config/server.reverseproxy.patch ./scripts/common_entrypoint.sh /docker/
 
 ### Run dos2unix to prevent issues from windows files
 RUN apt-get update -y && apt-get install -y \
