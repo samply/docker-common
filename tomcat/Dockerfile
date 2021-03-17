@@ -32,9 +32,8 @@ ONBUILD COPY . $CATALINA_HOME/webapps/ROOT/
 
 ### Change to user with only www-data permissions
 ONBUILD RUN set -x ; \
-    adduser --disabled-password --system --ingroup www-data $COMPONENT; \
+    adduser --disabled-password --ingroup www-data $COMPONENT; \
     chown -R $COMPONENT:www-data $CATALINA_HOME /scripts/ /run/secrets/; \
     chmod -R 755 $CATALINA_HOME /scripts/;
-ONBUILD USER $COMPONENT:www-data
 
 ENTRYPOINT ["/scripts/tomcat_entrypoint.sh"]
