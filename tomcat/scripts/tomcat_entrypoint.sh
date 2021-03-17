@@ -46,14 +46,24 @@ if [ -n "$TOMCAT_REVERSEPROXY_FQDN" ]; then
   echo "Info: ReverseProxy configuration is finished"
 fi
 
+# SSL Certs
+if [ -d "/docker/custom-certs" ]; then
+	echo "Info: Found custom-certs. Now starting import of certs:"
+	for file in /docker/custom-certs/*; do
+		cp -v $file /usr/local/share/ca-certificates/$(basename $file).crt
+	done
+	update-ca-certificates || (echo -e "\nError: The system has REJECTED one of the certificates:"; ls -l /docker/custom-certs/*; echo "Make sure that ALL of the certificates are valid."; exit 1)
+	echo "Info: Successfully imported custom-certs."
+fi
+
 if [ "$DEBUG" = 'true' ]; then
   ## Starting tomcat in remote debug mode
 	export JPDA_ADDRESS=1099;
 	export JPDA_TRANSPORT=dt_socket;
 	echo "Info: starting $COMPONENT tomcat with debug mode. Debug port is set to $JPDA_ADDRESS and JPDA_TRANSPORT is set to $JPDA_TRANSPORT";
-	exec catalina.sh jpda run;
+	su -c 'exec catalina.sh jpda run;' $COMPONENT
 else
   ## Starting tomcat in productive mode
   echo "Info: starting $COMPONENT tomcat ...";
-	exec catalina.sh run;
+	su -c 'exec catalina.sh run;' $COMPONENT
 fi
