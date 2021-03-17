@@ -33,7 +33,7 @@ ONBUILD COPY . $CATALINA_HOME/webapps/ROOT/
 ### Change to user with only www-data permissions
 ONBUILD RUN set -x ; \
     adduser --disabled-password --system --ingroup www-data $COMPONENT; \
-    chown -R $COMPONENT:www-data $CATALINA_HOME /scripts/ /run/secrets/; \
+    chown -R $COMPONENT:www-data $CATALINA_HOME /scripts/ /run/secrets/ /docker/; \
     chmod -R 755 $CATALINA_HOME /scripts/;
 ONBUILD USER $COMPONENT:www-data
 
