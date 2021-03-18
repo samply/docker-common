@@ -1,5 +1,5 @@
 #!/bin/bash -e
-source /scripts/common_entrypoint.sh
+source /docker/common_entrypoint.sh
 ### Configure tomcat
 ## default environment
 : "${TOMCAT_REVERSEPROXY_SSL:=false}"
@@ -20,8 +20,8 @@ if [ -n "$TOMCAT_REVERSEPROXY_FQDN" ]; then
   echo "Info: Configuring reverse proxy for URL $TOMCAT_REVERSEPROXY_FQDN";
   mv $CATALINA_HOME/conf/server.xml $CATALINA_HOME/conf/server.xml.ori;
   ## Apply add reversproxy configuration to
-  echo "Info: applying $CATALINA_HOME/conf/server.reverseproxy.patch on $CATALINA_HOME/conf/server.xml"
-  patch -i $CATALINA_HOME/conf/server.reverseproxy.patch -o $CATALINA_HOME/conf/server.xml $CATALINA_HOME/conf/server.xml.ori
+  echo "Info: applying /docker/server.reverseproxy.patch on $CATALINA_HOME/conf/server.xml"
+  patch -i /docker/server.reverseproxy.patch -o $CATALINA_HOME/conf/server.xml $CATALINA_HOME/conf/server.xml.ori
   if [ -z "$TOMCAT_REVERSEPROXY_PORT" ]; then
 	  case "$TOMCAT_REVERSEPROXY_SSL" in
 	  	true)
