@@ -43,6 +43,7 @@ if [ -n "$TOMCAT_REVERSEPROXY_FQDN" ]; then
   	s|TOMCAT_REVERSEPROXY_PORT|$TOMCAT_REVERSEPROXY_PORT|g ; \
   	s|TOMCAT_REVERSEPROXY_SSL|$TOMCAT_REVERSEPROXY_SSL|g" \
   	$CATALINA_HOME/conf/server.xml;
+  chown -R $COMPONENT:www-data $CATALINA_HOME/conf/server.xml;
   echo "Info: ReverseProxy configuration is finished"
 fi
 

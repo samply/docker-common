@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2021-03-19
+### Fixed
+- Permission denied exception then starting with activated reverse proxy configuration
 ## [0.3.0] - 2021-03-19
 ### Added 
 - Possibility to import self signed certificates for the application to trust. You need to create a volume that mounts into "/docker/custom-certs" and place your certificates there.
