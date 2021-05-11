@@ -54,6 +54,12 @@ for templateFilename in $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/*; do
       echo "Info: Updating value of environment variable $var";
       sed -i "s|$var|${!var}|g" "$templateFilename";
     done
+    # common variables which are available for usage in every container
+    common_vars="HTTP_PROXY_HOST HTTP_PROXY_PORT HTTP_PROXY_USERNAME HTTP_PROXY_PASSWORD HTTPS_PROXY_HOST HTTPS_PROXY_PORT HTTPS_PROXY_USERNAME HTTPS_PROXY_PASSWORD NO_PROXY_HOSTS"
+    for var in $common_vars; do
+      echo "Info: Updating value of environment variable $var";
+      sed -i "s|$var|${!var}|g" "$templateFilename";
+    done
     cp -f "$templateFilename" "${filename}";
   fi
 done
