@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2021-05-14
+### Added
+- Proxy environment variables, which are available for use in every inheriting image
+### Fixed
+- Removed RemoteValve Configuration in reverseproxy settings. The settings there resulted in overriding the original reverseproxy settings
+- Switched to Dockerfiles USER instruction instead of switching the user at the end of entrypoint. The original way resulted in longer container shutdowns due to multiple processes running in the container
 ## [0.3.1] - 2021-03-19
 ### Fixed
 - Permission denied exception then starting with activated reverse proxy configuration
