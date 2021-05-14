@@ -108,6 +108,19 @@ secrets:
     file: test.ui.docker.conf 
 ```
 
+##### Using common variables from docker-common
+There are some variables, like the proxy configuration, that are likely for usage in every image. Because of this docker common will by default search for following variables:
+
+|Variable|Description|
+|HTTP_PROXY_URL|The url of a http proxy server, eg. proxy.example.de:8080| 
+|HTTP_PROXY_USERNAME|The user used for authentication with http proxy server| 
+|HTTP_PROXY_PASSWORD|The password used for authentication with http proxy server| 
+|HTTPS_PROXY_URL|The host of a https proxy server, eg. proxy.example.de:8080| 
+|HTTPS_PROXY_USERNAME|The user used for authentication with https proxy server| 
+|HTTPS_PROXY_PASSWORD|The password used for authentication with https proxy server| 
+|NO_PROXY_HOSTS|The hosts for which the proxy should not be used|
+
+> Note: The proxy variables will be used for additionally defining http_proxy and https_proxy environment variables.
 ### Contributing
 Pull requests are welcome. TODO:
 
