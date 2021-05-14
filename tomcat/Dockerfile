@@ -29,4 +29,5 @@ ONBUILD RUN set -x ; \
     chown -R $COMPONENT:www-data $CATALINA_HOME /docker/ /run/secrets/; \
     chmod -R 755 $CATALINA_HOME /docker/;
 
+ONBUILD USER $COMPONENT
 ENTRYPOINT ["/docker/tomcat_entrypoint.sh"]
