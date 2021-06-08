@@ -22,21 +22,19 @@ if [ -n "$TOMCAT_REVERSEPROXY_FQDN" ]; then
   ## Apply add reversproxy configuration to
   echo "Info: applying /docker/server.reverseproxy.patch on $CATALINA_HOME/conf/server.xml"
   patch -i /docker/server.reverseproxy.patch -o $CATALINA_HOME/conf/server.xml $CATALINA_HOME/conf/server.xml.ori
-  if [ -z "$TOMCAT_REVERSEPROXY_PORT" ]; then
-	  case "$TOMCAT_REVERSEPROXY_SSL" in
-	  	true)
-	  		TOMCAT_REVERSEPROXY_PORT=443
-	  		TOMCAT_REVERSEPROXY_SCHEME=https
-	  		;;
-	  	false)
-	  		TOMCAT_REVERSEPROXY_PORT=80
-	  		TOMCAT_REVERSEPROXY_SCHEME=http
-	  		;;
-	  	*)
-	  		echo "Error: Please set TOMCAT_REVERSEPROXY_SSL to either true or false."
-	  		exit 1
-	  esac
-  fi
+  case "$TOMCAT_REVERSEPROXY_SSL" in
+    true)
+      : "${TOMCAT_REVERSEPROXY_PORT:=443}"
+      TOMCAT_REVERSEPROXY_SCHEME=https
+      ;;
+    false)
+      : "${TOMCAT_REVERSEPROXY_PORT:=80}"
+      TOMCAT_REVERSEPROXY_SCHEME=http
+      ;;
+    *)
+      echo "Error: Please set TOMCAT_REVERSEPROXY_SSL to either true or false."
+      exit 1
+  esac
   echo "Info: Applying configuration for ReverseProxy with settings: TOMCAT_REVERSEPROXY_FQDN=$TOMCAT_REVERSEPROXY_FQDN TOMCAT_REVERSEPROXY_PORT=$TOMCAT_REVERSEPROXY_PORT TOMCAT_REVERSEPROXY_SSL=$TOMCAT_REVERSEPROXY_SSL"
   sed -i -e "s|TOMCAT_REVERSEPROXY_FQDN|$TOMCAT_REVERSEPROXY_FQDN|g ; \
   	s|TOMCAT_REVERSEPROXY_SCHEME|$TOMCAT_REVERSEPROXY_SCHEME|g ; \
