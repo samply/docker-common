@@ -4,10 +4,12 @@ echo "Info: executing common_entrypoint.sh";
 ### Process docker secrets
 if [ -d "/run/secrets" ]; then
   for file in "/run/secrets/"*; do
-    echo "Info: Found secret file: $file";
-    envName=$(echo $file | tr '[:lower:]' '[:upper:]' | sed -e "s|/RUN/SECRETS/||" -e "s|_SECRET||");
-    echo "Info: now writing content of $file to $envName";
-    eval export "$envName"="$(cat $file)";
+    if [[ "$file" == *"_secret" || "$file" == *"_SECRET" ]] ; then
+      echo "Info: Found secret file: $file";
+      envName=$(echo "$file" | tr '[:lower:]' '[:upper:]' | sed -e "s|/RUN/SECRETS/||" -e "s|_SECRET||");
+      echo "Info: now writing content of $file to $envName";
+      eval export "$envName"="$(cat $file)";
+    fi
   done
 fi
 
