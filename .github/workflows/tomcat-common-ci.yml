@@ -20,62 +20,50 @@ jobs:
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-
-      - name: Build tomcat-common image for linux/amd64
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./tomcat/Dockerfile
-          platforms: "linux/amd64"
-          tags: tomcat-common:ci
-          push: false
-          load: true
-      - name: Build tomcat-common image for linux/arm64/v8
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./tomcat/Dockerfile
-          platforms: "linux/arm64/v8"
-          tags: tomcat-common:ci
-          push: false
-          load: true
-
-        # TODO: Implement integration tests for the docker.common tomcat image
-
-        # Case 1: Deploy to GitHub Registry, only for pull requests
-      - name: Retag tomcat-common:ci for Github Container Registry
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Retrieve Docker Tag
+        id: retrieve_docker_tag
         run: |
-          docker images
-          docker tag tomcat-common:ci ghcr.io/samply/tomcat-common:${GITHUB_HEAD_REF/\//\-}
-          docker images
+          if [ "$GITHUB_EVENT_NAME" = 'pull_request' ]; then
+            export DOCKER_TAG=${GITHUB_HEAD_REF/\//\-};
+          else
+            export DOCKER_TAG=${GITHUB_REF##*/}
+          fi
+          echo $DOCKER_TAG
+          echo "##[set-output name=docker_tag;]${DOCKER_TAG}"
+
       - name: Log in to the Github Container Registry
         uses: docker/login-action@v1
-        if: ${{ github.event_name == 'pull_request' }}
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push to ghcr.io/samply/tomcat-common
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          docker push ghcr.io/samply/tomcat-common:${GITHUB_HEAD_REF/\//\-}
 
-        # Case 2: Deploy to Docker Hub, for master, develop and tags
-      - name: Retag tomcat-common:ci for Docker Hub
-        if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          docker tag tomcat-common:ci samply/tomcat-common:${GITHUB_REF}
+        # Case 1: triggered from pull request, push only to ghcr.io
+      - name: Build and push for ghcr.io
+        uses: docker/build-push-action@v2
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          context: .
+          file: ./tomcat/Dockerfile
+          platforms: "linux/amd64,linux/arm64/v8"
+          tags: ghcr.io/samply/tomcat-common:${{ steps.retrieve_docker_tag.outputs.docker_tag }}
+          push: true
+
+        # Case 2: triggered by master, develop or version tag. Deploy to Docker Hub and ghcr.io
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         if: ${{ github.event_name != 'pull_request' }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Push to samply/tomcat-common on Docker Hub
+      - name: Build and push for ghcr.io and Docker Hub
+        uses: docker/build-push-action@v2
         if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          docker push samply/tomcat-common:${GITHUB_REF}
-      - name: List images
-        run: |
-          docker images
+        with:
+          context: .
+          file: ./tomcat/Dockerfile
+          platforms: "linux/amd64,linux/arm64/v8"
+          tags: samply/tomcat-common:${{ steps.retrieve_docker_tag.outputs.docker_tag }},ghcr.io/samply/tomcat-common:${{ steps.retrieve_docker_tag.outputs.docker_tag }}
+          push: true
+
+# TODO: Implement integration tests for the tomcat-common image
