@@ -11,7 +11,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
@@ -20,40 +20,35 @@ jobs:
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-      - name: Build tomcat-common image
+
+      - name: Build tomcat-common image for linux/amd64
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./tomcat/Dockerfile
-          platforms: linux/amd64
+          platforms: "linux/amd64"
           tags: tomcat-common:ci
           push: false
-          outputs: type=docker,dest=/tmp/tomcat-common.tar
-      - name: Upload docker image as artifact
-        uses: actions/upload-artifact@v2
+          load: true
+      - name: Build tomcat-common image for linux/arm64/v8
+        uses: docker/build-push-action@v2
         with:
-          name: tomcat-common
-          path: /tmp/tomcat-common.tar
-  # test: TODO: Implement integration tests for the docker.common tomcat image
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download the docker image from artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: tomcat-common
-          path: /tmp
-      - name: Load the image from tar
-        run: |
-          docker load --input /tmp/tomcat-common.tar
-          docker image ls -a
+          context: .
+          file: ./tomcat/Dockerfile
+          platforms: "linux/arm64/v8"
+          tags: tomcat-common:ci
+          push: false
+          load: true
+
+        # TODO: Implement integration tests for the docker.common tomcat image
 
         # Case 1: Deploy to GitHub Registry, only for pull requests
       - name: Retag tomcat-common:ci for Github Container Registry
         if: ${{ github.event_name == 'pull_request' }}
         run: |
+          docker images
           docker tag tomcat-common:ci ghcr.io/samply/tomcat-common:${GITHUB_HEAD_REF/\//\-}
+          docker images
       - name: Log in to the Github Container Registry
         uses: docker/login-action@v1
         if: ${{ github.event_name == 'pull_request' }}
