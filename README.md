@@ -120,7 +120,7 @@ docker build -t your-final-image --build-arg COMPONENT=example .
 The resulting image will only handle environment variables starting with the prefix "EXAMPLE_". 
 #### Additional Environment Variables in samply/tomcat-common
 ## Known Issues
-For a list of currently known issues please refer to [Known Issues](https://github.com/othneildrew/Best-README-Template/issues)
+For a list of currently known issues please refer to [Known Issues](https://github.com/samply/docker-common/issues)
 
 ## License
 
