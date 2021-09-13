@@ -1,53 +1,16 @@
-# docker.common
+# Docker Common
 
-docker.common is a project to consolidate build processes of the docker images for different components. The main focus is to
-keep components unaware of how their docker image is build. In the ideal case it should be possible to create a docker image for
-a component, without adding any file to the components repository.
+The main focus of this Project is to build base images for developers that handle common deployment tasks, e.g. environment variables for configuring tomcat for deployment behind a reverse proxy.
 
-## Installation
+## Contents
+Currently, this repository provides implementation for following images:
+- [samply/tomcat-common](https://hub.docker.com/r/samply/tomcat-common)
 
-TODO: Is there any installation if you don't need to download this repository for usage?
+## Prequeresites
+- [Docker Community Engine](https://docs.docker.com/engine/install/)
 
-### Prequeresites
-You will need docker to create docker images with the files from this repository :)
-
-## Usage
-
-In this section the usage of the different common images (subdirectories in this repository besides script directory) will be described.
-
-> Note: In the next section commands often refer to <common_repository_url>. 
->       This can be replaced by a link like this: https://bitbucket.org/brennert/docker.common/raw/11df911fc47f212d89d6bf4ff92434cf3380fdbc
-### Builders
-Builders are needed to build the artifacts, that will be deployed in the final component image.
-#### maven-git
-To build a war file from component repository with maven-git, you will first need to prepare a builder image:
-```shell script
-curl <common_repository_url>/maven-git/Dockerfile | docker build -t maven-git-builder -
-```
-> Note: The maven-git-builder supports a build arg for selection of maven image: MAVEN_VERSION
-
-With this new build builder image, you can build your components war file (Assuming you are currently at the root of your components repository):
-```shell script
-docker run -it --rm --name component-build -v /$(pwd)/://usr/src/build/ -w //usr/src/build/ maven-git-builder mvn clean install;
-```
-> Note: If you want to use your local maven repository and settings, you can pass them as a volume (assuming your repository and maven configuration reside in $HOME/.m2):
->       -v /$HOME/.m2/://root/.m2
-
-### Final Images
-With these images you can build your component image. They need a artifact(e.g. an exploded WAR file) from you. You can either generate artifacts yourself or use a builder from this repository.
-#### tomcat - Outdated, needs update
-The docker common image is available on docker hub at [https://hub.docker.com/r/torbenbrenner/tomcat.common](https://hub.docker.com/r/torbenbrenner/tomcat.common)
-The image defines different onbuild steps, so you can import it and get the full functionality of docker.common.
-You can use it like:
-```Dockerfile
-FROM torbenbrenner/tomcat.common:latest
-### Additional configuration like unpacking a war file (the image normally uses exploded wars)
-# MAINTAINER you
-### You can set default values for your environment variables
-```
-
-#### Configuration of component image
-##### Defining Environment Variables available for the user
+## Features
+### Generic Implementation for Replacing Environment Variables in Template Files
 Then building an image, you would normally like to give your users access to different component specific environment variables like 
 a password that is needed to login in to your components ui. These passwords normally are part of configuration files used by your component. 
 For example component test could need the config file "test.ui.conf" which looks like:
@@ -69,11 +32,13 @@ Then you now build an image with this repository you can use following environme
 |ADMIN_USER_NAME|ADMIN_USER_NAME|
 |ADMIN_USER_PASSWORD|ADMIN_USER_PASSWORD|
 
-Users of the image can also pass secrets to the container running the image:
+### Automatic Docker Secret Support
+Secrets passed to the container inside the "/run/secrets/" directory will automatically cause the entrypoint script to set the related environment variables value.
+E.g. passing secrets for the environment variables from the previous section would look like this
 ```yaml
 services:
   testcomponent:
-    image: test-image
+    image: <your-final-image>
     secrets:
       - ADMIN_USER_NAME_SECRET
       - ADMIN_USER_PASSWORD_SECRET
@@ -84,23 +49,13 @@ secrets:
     external: true
 ```
 
-##### Defining Mandatory Variables
-Maybe you want users to always define a password then using the image. For this case the build arg "MANDATORY_VARIABLES" can be used.
-You can specify the needed Environment Variables in a List separated by spaces: 
-e.g. ```--build-arg MANDATORY_VARIABLES="IMPORTANT_PASSWORD REALLY_IMPORTANT_PASSWORD"``` 
-
-##### Adding new template files without changing the repository
-At the beginning, it was necessary to add an template file to the components repository. Starting from COMMIT (TODO: Insert commit) it is 
-possible, to add template files at startup of the container.
-> Note: It is necessary to use docker-compose/docker stack features for this.
-
-In the example of how to define environment variables, we used test.ui.docker.conf and added it to the component repository to give
-users access to ADMIN_USER_NAME and ADMIN_USER_PASSWORD environment variables. With docker-compose we can use the secrets/config feature
-to pass a template file at runtime:
+### Configuration Templates at End User Level
+Not only the image creator has the possibility to define environment variables and secrets inside the template files. The user of the final image can pass their own configuration files at specified endpoints.
+E.g. 
 ```yaml
 services:
   testcomponent:
-    image: test-image
+    image: <your-final-image>
     secrets:
       - test.ui.docker.conf
 secrets:
@@ -108,7 +63,7 @@ secrets:
     file: test.ui.docker.conf 
 ```
 
-##### Using common variables from docker-common
+### Environment Variables available for all Images
 There are some variables, like the proxy configuration, that are likely for usage in every image. Because of this docker common will by default search for following variables:
 
 |Variable|Description|
@@ -122,20 +77,57 @@ There are some variables, like the proxy configuration, that are likely for usag
 |NO_PROXY_HOSTS|The hosts for which the proxy should not be used|
 
 > Note: The proxy variables will be used for additionally defining http_proxy and https_proxy environment variables.
-### Contributing
-Pull requests are welcome. TODO:
 
-Please make sure to update tests as appropriate.
+### Defining Mandatory Variables
+Maybe you want users to always define a password then using the image. For this case the build arg "MANDATORY_VARIABLES" can be used.
+You can specify the needed Environment Variables in a List separated by spaces: 
+e.g. ```--build-arg MANDATORY_VARIABLES="IMPORTANT_PASSWORD REALLY_IMPORTANT_PASSWORD"``` 
 
-TODO: License
+### Defining Default Values
+In your components Dockerfile you can set default values for variables by using the "ENV" keyword
+e.g. ```ENV EXAMPLE_PASSWORD=pleaseChangeMe```
 
-### Known Issues
-# Dockerignore in Repositories will be used
-Passing the repository as build context can lead to issues with building the specific repository.
-For example using https://code.mitro.dkfz.de/scm/auth/samply.auth.webapp.git#develop in the -r
-option will lead to failing of the maven build with message maven goal not defined. The reason for
-this is, that the repository will be copied to build context, but docker checks .dockerignore in the
-context before copying everything. Pom is excluded by .dockerignore in this specific case.
-# Changed localRepositoryLocations in Maven Settings results in docker error
-Then you change the location of your local maven repository, it will result in issues then mounting it to docker container.
-The container will try to access the path you specified in your settings.xml and will most likely not find it. 
+## Usage
+This section provides examples on how to use the different images provided by this repository.
+
+### tomcat-common
+You can use it like this:
+``` Dockerfile
+ARG TOMCAT_COMMON_VERSION=latest
+FROM alpine:latest as extract
+RUN apk add --no-cache unzip
+ADD target/<YourPackageName>.war ./<YourPackageName>.war
+RUN mkdir -p /extracted && \
+       unzip ./<YourPackageName> -d /extracted
+FROM samply/tomcat-common:${TOMCAT_COMMON_VERSION}
+MAINTAINER <m.mustermann@example.com>
+ARG COMPONENT=example
+ENV COMPONENT=${COMPONENT}
+# You can set define mandatory variables (separated with spaces). Starting the container without these will fail.
+ENV MANDATORY_VARIABLES="REALLY_IMPORTANT_VARIABLE"
+# You can set default values for your environment variables
+ENV EXAMPLE_LOG_LEVEL="info"
+# Finally copy the artifact from the extract stage
+COPY --chown="example:www-data" --from=extract ./extracted/ $CATALINA_HOME/webapps/ROOT/
+```
+
+Assuming you placed the Dockerfile at the root of your repository (e.g. where your pom.xml is located), you can now build your image with
+
+``` shell
+docker build -t your-final-image --build-arg COMPONENT=example .
+```
+
+The resulting image will only handle environment variables starting with the prefix "EXAMPLE_". 
+#### Additional Environment Variables in samply/tomcat-common
+## Known Issues
+For a list of currently known issues please refer to [Known Issues](https://github.com/othneildrew/Best-README-Template/issues)
+
+## License
+
+Copyright 2019 - 2021 The Samply Community
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
