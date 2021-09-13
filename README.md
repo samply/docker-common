@@ -112,6 +112,7 @@ secrets:
 There are some variables, like the proxy configuration, that are likely for usage in every image. Because of this docker common will by default search for following variables:
 
 |Variable|Description|
+|--------|-----------|
 |HTTP_PROXY_URL|The url of a http proxy server, eg. proxy.example.de:8080| 
 |HTTP_PROXY_USERNAME|The user used for authentication with http proxy server| 
 |HTTP_PROXY_PASSWORD|The password used for authentication with http proxy server| 
