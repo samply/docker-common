@@ -2,13 +2,16 @@
 echo "Info: executing common_entrypoint.sh";
 ### TODO: How can users of docker common specify default values?
 ### Process docker secrets
-for var in $(compgen -e | grep -i "$COMPONENT"); do
-  echo "Info: Checking secret ${var}_SECRET for environment variable $var"
-  if [ -e "/run/secrets/${var}_SECRET" ]; then \
-    echo "Info: secret found for ${var}_SECRET. Now writing value back to $var";
-    var=$(cat "/run/secrets/${var}_SECRET");
-  fi
-done
+if [ -d "/run/secrets" ]; then
+  for file in "/run/secrets/"*; do
+    if [[ "$file" == *"_secret" || "$file" == *"_SECRET" ]] ; then
+      echo "Info: Found secret file: $file";
+      envName=$(echo "$file" | tr '[:lower:]' '[:upper:]' | sed -e "s|/RUN/SECRETS/||" -e "s|_SECRET||");
+      echo "Info: now writing content of $file to $envName";
+      eval export "$envName"="$(cat $file)";
+    fi
+  done
+fi
 
 MISSING_VARS=""
 

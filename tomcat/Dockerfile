@@ -1,4 +1,4 @@
-ARG TOMCAT_VERSION="8-jdk8-openjdk-slim"
+ARG TOMCAT_VERSION="10-jdk8-temurin"
 FROM tomcat:$TOMCAT_VERSION
 MAINTAINER Torben Brenner "t.brenner@dkfz-heidelberg.de"
 ### Environment Variables need to be set at build time

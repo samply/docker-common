@@ -1,0 +1,116 @@
+# This workflow represents the continuous integration pipeline for the samply/tomcat-common docker image
+
+name: Build, Test and Deploy samply/tomcat-common
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # everyday at 8am
+  push:
+    branches: ["main", "develop"]
+    tags:
+      - '*.*.*'
+  pull_request:
+    branches:
+      - "main"
+      - "develop"
+jobs:
+  ci:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and export to Docker
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./tomcat/Dockerfile
+          load: true
+          tags: tomcat-common
+
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'tomcat-common'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Run Snyk to check Docker images for vulnerabilities
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: tomcat-common
+          args: --severity-threshold=high
+
+      - name: Define Tags for Github Container Registry
+        id: docker-meta-ghcr
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            "ghcr.io/samply/tomcat-common"
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Image to Github Container Registry
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./tomcat/Dockerfile
+          push: true
+          platforms: "linux/amd64,linux/arm64/v8"
+          labels: ${{ steps.docker-meta-ghcr.outputs.labels }}
+          tags: ${{ steps.docker-meta-ghcr.outputs.tags }}
+
+      - name: Define Tags for Docker Hub
+        id: docker-meta-dockerhub
+        uses: docker/metadata-action@v3
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          images: |
+            "samply/tomcat-common"
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push Image to Docker Hub
+        uses: docker/build-push-action@v2
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          context: .
+          file: ./tomcat/Dockerfile
+          push: true
+          platforms: "linux/amd64,linux/arm64/v8"
+          labels: ${{ steps.docker-meta-dockerhub.outputs.labels }}
+          tags: ${{ steps.docker-meta-dockerhub.outputs.tags }}
