@@ -42,7 +42,7 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH,MEDIUM'
+          severity: 'CRITICAL,HIGH'
 
       - name: Run Snyk to check Docker images for vulnerabilities
         uses: snyk/actions/docker@master
