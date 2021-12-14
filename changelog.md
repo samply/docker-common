@@ -3,7 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
+## Unreleased
+### Fixed
+- Permission Denied Exeception then user supplies own certificate
 ## [4.0.2] - 2021-09-14
 ### Changed
 - Decreased Tomcat Version from 10 to 9. Some of the depending components won't start with Tomcat 10.
