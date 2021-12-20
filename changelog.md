@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## Unreleased
+### Added
+- Added Mount Point for User Provided Certificates in Dockerfile for Tomcat. This will ensure, that the final user running the process in container will have permission to access those certificates.
 ## [0.4.3] - 2021-12-14
 ### Fixed
 - Permission Denied Exeception then user supplies own certificate

@@ -14,6 +14,9 @@ ONBUILD ENV MANDATORY_VARIABLES=$MANDATORY_VARIABLES
 ARG COMMON_REPOSITORY_VERSION=develop
 LABEL docker.common.version="$COMMON_REPOSITORY_VERSION"
 
+# mount point for certificates provided by users of the final image
+VOLUME ["/docker/custom-certs"]
+
 ### ADD scripts that will run on container startup
 ### ADD config files for tomcat configuration. These files will be processed in tomcat_entrypoint.sh
 ADD ./tomcat/scripts/tomcat_entrypoint.sh ./tomcat/config/server.reverseproxy.patch ./scripts/common_entrypoint.sh /docker/
