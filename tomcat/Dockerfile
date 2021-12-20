@@ -10,10 +10,6 @@ ONBUILD ENV COMPONENT=$COMPONENT
 ONBUILD ARG MANDATORY_VARIABLES=""
 ONBUILD ENV MANDATORY_VARIABLES=$MANDATORY_VARIABLES
 
-### This will specify the version to use from https://github.com/samply/docker-common. This can be any tag, branchname or commit hash
-ARG COMMON_REPOSITORY_VERSION=develop
-LABEL docker.common.version="$COMMON_REPOSITORY_VERSION"
-
 # mount point for certificates provided by users of the final image
 VOLUME ["/docker/custom-certs"]
 

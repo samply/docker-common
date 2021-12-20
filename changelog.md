@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 ### Added
 - Added Mount Point for User Provided Certificates in Dockerfile for Tomcat. This will ensure, that the final user running the process in container will have permission to access those certificates.
+### Removed
+- Deprecated build.sh that was used in previous versions for building docker-common images. The script is no longer needed, because we simplified the build process by using ONBUILD commands in the Dockerfile.
 ## [0.4.3] - 2021-12-14
 ### Fixed
 - Permission Denied Exeception then user supplies own certificate
