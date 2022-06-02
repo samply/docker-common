@@ -66,3 +66,11 @@ for templateFilename in $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/*; do
     cp -f "$templateFilename" "${filename}";
   fi
 done
+
+PROTO="$(echo $HTTP_PROXY_URL | grep :// | sed -e's,^\(.*://\).*,\1,g')"
+
+URL="$(echo ${HTTP_PROXY_URL/$PROTO/})"
+HOST="$(echo $URL | sed -e 's,:.*,,g')"
+PORT="$(echo $URL | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+
+sed -i "s/PROXYHOST/$HOST/g; s/PROXYPORT/$PORT/g" /etc/proxychains4.conf

@@ -60,9 +60,9 @@ if [ "$DEBUG" = 'true' ]; then
 	export JPDA_ADDRESS=1099;
 	export JPDA_TRANSPORT=dt_socket;
 	echo "Info: starting $COMPONENT tomcat with debug mode. Debug port is set to $JPDA_ADDRESS and JPDA_TRANSPORT is set to $JPDA_TRANSPORT";
-	exec catalina.sh jpda run;
+	exec proxychains catalina.sh jpda run;
 else
   ## Starting tomcat in productive mode
   echo "Info: starting $COMPONENT tomcat ...";
-	exec catalina.sh run;
+	exec proxychains catalina.sh run;
 fi

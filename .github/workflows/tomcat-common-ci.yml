@@ -6,7 +6,7 @@ on:
   schedule:
     - cron: '0 8 * * *' # everyday at 8am
   push:
-    branches: ["main", "develop"]
+    branches: ["main", "develop", "feature/addProxyChains"]
     tags:
       - '*.*.*'
   pull_request:

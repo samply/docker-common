@@ -19,8 +19,10 @@ ADD ./tomcat/scripts/tomcat_entrypoint.sh ./tomcat/config/server.reverseproxy.pa
 
 ### Run dos2unix to prevent issues from windows files
 RUN apt-get update -y && apt-get install -y \
-	patch \
+	patch proxychains4 \
 	&& rm -rf /var/lib/apt/lists/*
+
+RUN sed -i 's/^# localnet /localnet /;s/^socks.*$/http PROXYHOST PROXYPORT/' /etc/proxychains4.conf
 
 ### Change to user with only www-data permissions
 ONBUILD RUN set -x ; \
