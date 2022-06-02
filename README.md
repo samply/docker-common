@@ -118,7 +118,9 @@ docker build -t your-final-image --build-arg COMPONENT=example .
 ```
 
 The resulting image will only handle environment variables starting with the prefix "EXAMPLE_". 
-#### Additional Environment Variables in samply/tomcat-common
+#### Additional features in samply/tomcat-common
+##### Proxy Chain
+You can activate [proxychains](https://github.com/haad/proxychains) for the startup of the tomcat with 'samply/tomcat-common'. For this you need to set the environment variable `USE_PROXYCHAIN=true` and pass the proxy url via `HTTP_PROXY_URL`. The start script will generate the correct proxychains configuration at `/tmp/proxychains4.conf`. The usual processing of `HTTP_PROXY_URL` and other proxy variables will not happen.
 ## Known Issues
 For a list of currently known issues please refer to [Known Issues](https://github.com/samply/docker-common/issues)
 
