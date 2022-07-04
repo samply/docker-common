@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## Unreleased
+### Added
+- Added Mount Point for User Provided Certificates in Dockerfile for Tomcat. This will ensure, that the final user running the process in container will have permission to access those certificates.
+- Added `USE_PROXYCHAIN` environment variable to the tomcat-common image. This will start the tomcat with [proxychains](https://github.com/haad/proxychains) enabled.
+### Changed
+- The base image for tomcat-common is now `tomcat:9-jdk8-temurin-focal`. The `tomcat:9-jdk8-temurin` version caused issues on some virtual machines.
+### Removed
+- Deprecated build.sh that was used in previous versions for building docker-common images. The script is no longer needed, because we simplified the build process by using ONBUILD commands in the Dockerfile.
+- Jenkinsfile, because we replaced Jenkins with the Github Actions Workflows. These will automatically create releases and push them to Docker Hub.
 ## [0.4.3] - 2021-12-14
 ### Fixed
 - Permission Denied Exeception then user supplies own certificate
