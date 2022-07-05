@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## Unreleased
+## [0.5.0] - 2022-07-05
 ### Added
 - Added Mount Point for User Provided Certificates in Dockerfile for Tomcat. This will ensure, that the final user running the process in container will have permission to access those certificates.
 - Added `USE_PROXYCHAIN` environment variable to the tomcat-common image. This will start the tomcat with [proxychains](https://github.com/haad/proxychains) enabled.
