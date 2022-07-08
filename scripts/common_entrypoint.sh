@@ -47,24 +47,28 @@ for templateFilename in /run/secrets/*; do
 done
 
 if [ "${USE_PROXYCHAIN^^}" = "TRUE" ]; then
-  PROTO="$(echo $HTTP_PROXY_URL | grep :// | sed -e's,^\(.*://\).*,\1,g')"
-  echo $PROTO
-  URL="$(echo ${HTTP_PROXY_URL/$PROTO/})"
-  echo $URL
-  HOST="$(echo $URL | sed -e 's,:.*,,g')"
-  echo $HOST
-  PORT="$(echo $URL | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
-  echo $PORT
-  IP="$(getent hosts $HOST | cut -d ' ' -f 1 | tail -1)"
-  echo $IP
-  sed -e "s/PROXYIP/$IP/g; s/PROXYPORT/$PORT/g" /etc/proxychains4.conf > /tmp/proxychains4.conf
-  if [ "proxychains-is-happy" != "$(/docker/proxify.sh echo proxychains-is-happy)" ]; then
-    echo "Error: Failed to configure proxychains with proxy $HTTP_PROXY_URL (= HTTP_PROXY_URL)"
-    exit 1
+  if [ -z "${HTTP_PROXY_URL}" ]; then
+    echo "Info: HTTP_PROXY_URL variable is empty. Stopping proxychains configuration."
+  else
+    PROTO="$(echo $HTTP_PROXY_URL | grep :// | sed -e's,^\(.*://\).*,\1,g')"
+    echo $PROTO
+    URL="$(echo ${HTTP_PROXY_URL/$PROTO/})"
+    echo $URL
+    HOST="$(echo $URL | sed -e 's,:.*,,g')"
+    echo $HOST
+    PORT="$(echo $URL | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+    echo $PORT
+    IP="$(getent hosts $HOST | cut -d ' ' -f 1 | tail -1)"
+    echo $IP
+    sed -e "s/PROXYIP/$IP/g; s/PROXYPORT/$PORT/g" /etc/proxychains4.conf > /tmp/proxychains4.conf
+    if [ "proxychains-is-happy" != "$(/docker/proxify.sh echo proxychains-is-happy)" ]; then
+      echo "Error: Failed to configure proxychains with proxy $HTTP_PROXY_URL (= HTTP_PROXY_URL)"
+      exit 1
+    fi
+    echo "Info: Successfully configured proxychains with proxy $HTTP_PROXY_URL (= HTTP_PROXY_URL)"
+    # Ensure proxy handling is stopped here
+    unset HTTP_PROXY_URL HTTP_PROXY_USERNAME HTTP_PROXY_PASSWORD HTTPS_PROXY_URL HTTPS_PROXY_USERNAME HTTPS_PROXY_PASSWORD NO_PROXY_HOSTS
   fi
-  echo "Info: Successfully configured proxychains with proxy $HTTP_PROXY_URL (= HTTP_PROXY_URL)"
-  # Ensure proxy handling is stopped here
-  unset HTTP_PROXY_URL HTTP_PROXY_USERNAME HTTP_PROXY_PASSWORD HTTPS_PROXY_URL HTTPS_PROXY_USERNAME HTTPS_PROXY_PASSWORD NO_PROXY_HOSTS
 fi
 
 ### Iterate through templates copied to container
