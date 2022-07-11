@@ -46,7 +46,7 @@ if [ -n "$TOMCAT_REVERSEPROXY_FQDN" ]; then
 fi
 
 # SSL Certs
-if [ -e "/docker/custom-certs/*" ]; then
+if [ "$(ls -A /docker/custom-certs/)" ]; then
 	echo "Info: Found custom-certs. Now starting import of certs:"
 	for file in /docker/custom-certs/*; do
 		cp -v $file /usr/local/share/ca-certificates/$(basename $file).crt
