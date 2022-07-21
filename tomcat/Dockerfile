@@ -27,7 +27,7 @@ RUN sed -i 's/^# localnet /localnet /;s/^socks.*$/http PROXYIP PROXYPORT/' /etc/
 ### Change to user with only www-data permissions
 ONBUILD RUN set -x ; \
     adduser --disabled-password --ingroup www-data $COMPONENT; \
-    chown -R $COMPONENT:www-data $CATALINA_HOME /docker/ /usr/local/share/ca-certificates/ /etc/ssl/certs/ /run/secrets/; \
+    chown -R $COMPONENT:www-data $CATALINA_HOME /docker/ /usr/local/share/ca-certificates/ $JAVA_HOME/jre/lib/security/cacerts /etc/ssl/certs/ /run/secrets/; \
     chmod -R 755 $CATALINA_HOME /docker/;
 
 ONBUILD USER $COMPONENT
