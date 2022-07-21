@@ -48,8 +48,13 @@ fi
 # SSL Certs
 if [ "$(ls -A /docker/custom-certs/)" ]; then
 	echo "Info: Found custom-certs. Now starting import of certs:"
+  castore="$JAVA_HOME/jre/lib/security/cacerts"
 	for file in /docker/custom-certs/*; do
 		cp -v $file /usr/local/share/ca-certificates/$(basename $file).crt
+    # Import the certificate using keytool to ensure import even on images that are not debian based
+    random=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1);
+    echo "Info: Importing $file into $castore as $random";
+    keytool -importcert -file "$file" -keystore "$castore" --storepass "changeit" -alias "$random" -noprompt;
 	done
 	update-ca-certificates || (echo -e "\nError: The system has REJECTED one of the certificates:"; ls -l /docker/custom-certs/*; echo "Make sure that ALL of the certificates are valid."; exit 1)
 	echo "Info: Successfully imported custom-certs."
