@@ -1,4 +1,4 @@
-ARG TOMCAT_VERSION="9-jdk8-temurin-focal"
+ARG TOMCAT_VERSION="9-jdk17-temurin-focal"
 FROM tomcat:$TOMCAT_VERSION
 MAINTAINER Torben Brenner "t.brenner@dkfz-heidelberg.de"
 ### Environment Variables need to be set at build time
