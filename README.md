@@ -1,4 +1,5 @@
 # Docker Common
+[![Build, Test and Deploy samply/tomcat-common](https://github.com/samply/docker-common/actions/workflows/tomcat-common-ci.yml/badge.svg)](https://github.com/samply/docker-common/actions/workflows/tomcat-common-ci.yml)
 
 The main focus of this Project is to build base images for developers that handle common deployment tasks, e.g. environment variables for configuring tomcat for deployment behind a reverse proxy.
 
