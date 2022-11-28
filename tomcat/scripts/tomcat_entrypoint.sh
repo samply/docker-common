@@ -62,7 +62,7 @@ fi
 
 if [ "$DEBUG" = 'true' ]; then
   ## Starting tomcat in remote debug mode
-	export JPDA_ADDRESS=1099;
+	export JPDA_ADDRESS=*:1099;
 	export JPDA_TRANSPORT=dt_socket;
 	echo "Info: starting $COMPONENT tomcat with debug mode. Debug port is set to $JPDA_ADDRESS and JPDA_TRANSPORT is set to $JPDA_TRANSPORT";
 	exec /docker/proxify.sh catalina.sh jpda run;
