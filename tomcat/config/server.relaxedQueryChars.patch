@@ -1,0 +1,10 @@
+--- tomcat/config/server.xml	2022-11-09 19:43:47.000000000 +0100
++++ tomcat/config/server.docker.xml	2022-11-28 15:35:14.880724900 +0100
+@@ -67,6 +67,7 @@
+          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
+     -->
+     <Connector port="8080" protocol="HTTP/1.1"
++               relaxedQueryChars="RELAXED_QUERY_CHARS"
+                connectionTimeout="20000"
+                redirectPort="8443" />
+     <!-- A "Connector" using the shared thread pool-->
