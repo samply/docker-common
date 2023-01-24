@@ -49,7 +49,7 @@ if [ -n "$RELAXED_QUERY_CHARS" ]; then
     mv $CATALINA_HOME/conf/server.xml $CATALINA_HOME/conf/server.xml.ori;
     echo "Info: applying /docker/server.relaxedQueryChars.patch on $CATALINA_HOME/conf/server.xml"
     patch -i /docker/server.relaxedQueryChars.patch -o $CATALINA_HOME/conf/server.xml $CATALINA_HOME/conf/server.xml.ori
-    sed -i -e "s|RELAXED_QUERY_CHARS|'$RELAXED_QUERY_CHARS'|g" $CATALINA_HOME/conf/server.xml;
+    sed -i -e "s|RELAXED_QUERY_CHARS|$RELAXED_QUERY_CHARS|g" $CATALINA_HOME/conf/server.xml;
     chown -R $COMPONENT:www-data $CATALINA_HOME/conf/server.xml;
 fi
 
