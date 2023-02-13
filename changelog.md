@@ -4,8 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## Unreleased
-### Changed
+## [0.7.0] - 2023-02-13
+### Added 
 - RELAXED_QUERY_CHARS environment variable to allow additional characters in URI Path   
+- Separate Builds for Tomcat 10 marked by suffix `-tomcat-10`
+### Security
+- Now run `apt-get upgrade` during build to get newest security updates from packages in container
 ## [0.6.2] - 2022-11-18
 ### Fixed
 - Remote debug mode with jdk version > 9 (See: https://www.oracle.com/java/technologies/javase/9-notes.html#JDK-8041435)
@@ -40,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.4.1] - 2021-09-14
 ### Fixed
 - The TOMCAT\_REVERSEPROXY\_PORT environment variable now works as expected. If not set it defaults to port 80 for http and port 443 for https.
-- Instead of searching secrets for all defined environment variables, the start up script will now set environment variables from all files added to the container before startup at "/run/secrets" ending with either "\_secret" or "\_SECRET".
+- [ ] Instead of searching secrets for all defined environment variables, the start up script will now set environment variables from all files added to the container before startup at "/run/secrets" ending with either "\_secret" or "\_SECRET".
 ## [0.4.0] - 2021-05-14
 ### Added
 - Proxy environment variables, which are available for use in every inheriting image
