@@ -15,10 +15,10 @@ VOLUME ["/docker/custom-certs"]
 
 ### ADD scripts that will run on container startup
 ### ADD config files for tomcat configuration. These files will be processed in tomcat_entrypoint.sh
-ADD ./tomcat/scripts/tomcat_entrypoint.sh ./tomcat/config/server.reverseproxy.patch ./scripts/common_entrypoint.sh ./scripts/proxify.sh /docker/
+ADD ./tomcat/scripts/tomcat_entrypoint.sh ./tomcat/config/server.reverseproxy.patch ./tomcat/config/server.relaxedQueryChars.patch ./scripts/common_entrypoint.sh ./scripts/proxify.sh /docker/
 
 ### Run dos2unix to prevent issues from windows files
-RUN apt-get update -y && apt-get install -y \
+RUN apt-get update -y && apt-get upgrade -y && apt-get install -y \
 	patch proxychains4 \
 	&& rm -rf /var/lib/apt/lists/*
 
