@@ -16,6 +16,13 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          - tomcat_version: "9-jdk17-temurin-jammy"
+            image_suffix: ""
+          - tomcat_version: "10-jdk17-temurin-jammy"
+            image_suffix: "-tomcat-10"
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v2
@@ -33,6 +40,8 @@ jobs:
           file: ./tomcat/Dockerfile
           load: true
           tags: tomcat-common
+          build-args: |
+            TOMCAT_VERSION=${{matrix.tomcat_version}}
 
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@master
@@ -65,6 +74,8 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
+          flavor: |
+            suffix=${{matrix.image_suffix}}
 
       - name: Login to Github Container Registry
         uses: docker/login-action@v1
@@ -82,6 +93,8 @@ jobs:
           platforms: "linux/amd64,linux/arm64/v8"
           labels: ${{ steps.docker-meta-ghcr.outputs.labels }}
           tags: ${{ steps.docker-meta-ghcr.outputs.tags }}
+          build-args: |
+            TOMCAT_VERSION=${{matrix.tomcat_version}}
 
       - name: Define Tags for Docker Hub
         id: docker-meta-dockerhub
@@ -96,6 +109,8 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
+          flavor: |
+            suffix=${{matrix.image_suffix}}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v1
@@ -114,3 +129,7 @@ jobs:
           platforms: "linux/amd64,linux/arm64/v8"
           labels: ${{ steps.docker-meta-dockerhub.outputs.labels }}
           tags: ${{ steps.docker-meta-dockerhub.outputs.tags }}
+          build-args: |
+          flavor: |
+            suffix=${{matrix.image_suffix}}
+            TOMCAT_VERSION=${{matrix.tomcat_version}}
