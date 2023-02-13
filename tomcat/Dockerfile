@@ -18,7 +18,7 @@ VOLUME ["/docker/custom-certs"]
 ADD ./tomcat/scripts/tomcat_entrypoint.sh ./tomcat/config/server.reverseproxy.patch ./tomcat/config/server.relaxedQueryChars.patch ./scripts/common_entrypoint.sh ./scripts/proxify.sh /docker/
 
 ### Run dos2unix to prevent issues from windows files
-RUN apt-get update -y && apt-get install -y \
+RUN apt-get update -y && apt-get upgrade -y && apt-get install -y \
 	patch proxychains4 \
 	&& rm -rf /var/lib/apt/lists/*
 
