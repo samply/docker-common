@@ -130,6 +130,4 @@ jobs:
           labels: ${{ steps.docker-meta-dockerhub.outputs.labels }}
           tags: ${{ steps.docker-meta-dockerhub.outputs.tags }}
           build-args: |
-          flavor: |
-            suffix=${{matrix.image_suffix}}
             TOMCAT_VERSION=${{matrix.tomcat_version}}
