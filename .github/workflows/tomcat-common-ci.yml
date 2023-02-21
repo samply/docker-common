@@ -19,9 +19,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - tomcat_version: "9-jdk17-temurin-jammy"
+          - tomcat_version: "9-jdk17-temurin-focal"
             image_suffix: ""
-          - tomcat_version: "10-jdk17-temurin-jammy"
+          - tomcat_version: "10-jdk17-temurin-focal"
             image_suffix: "-tomcat-10"
     steps:
       - name: Checkout Source Code

@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## Unreleased
+## [0.7.2] - 2023-02-21
+### Fixed
+- tomcat:10-jdk17-temurin-jammy is incompatible with older docker engine versions
 ## [0.7.1] - 2023-02-15
 ### Fixed
 - Pipeline now should build images with `-tomcat-10` suffix really with tomcat version 10.
