@@ -56,7 +56,7 @@ fi
 # SSL Certs
 if [ "$(ls -A /docker/custom-certs/)" ]; then
 	echo "Info: Found custom-certs. Now starting import of certs:"
-  castore="$JAVA_HOME/jre/lib/security/cacerts"
+  castore="$JAVA_HOME/lib/security/cacerts"
 	for file in /docker/custom-certs/*; do
 		cp -v $file /usr/local/share/ca-certificates/$(basename $file).crt
     # Import the certificate using keytool to ensure import even on images that are not debian based
