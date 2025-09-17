@@ -23,8 +23,6 @@ jobs:
         include:
           - tomcat_version: "10"
             image_suffix: "-tomcat-10"
-          - tomcat_version: "11"
-            image_suffix: "-tomcat-11"
     # This workflow defines how a samply docker image is built, tested and published.
     # Visit: https://github.com/samply/github-workflows/blob/main/.github/workflows/docker-ci.yml, for more information
     uses: samply/github-workflows/.github/workflows/docker-ci.yml@main
