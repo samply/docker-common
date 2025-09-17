@@ -2,6 +2,7 @@
 name: Build, Test and Deploy samply/tomcat-common
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - $default-branch
