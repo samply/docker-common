@@ -1,133 +1,45 @@
 # This workflow represents the continuous integration pipeline for the samply/tomcat-common docker image
-
 name: Build, Test and Deploy samply/tomcat-common
 
 on:
-  schedule:
-    - cron: '0 8 * * *' # everyday at 8am
   push:
-    branches: ["main", "develop"]
+    branches:
+      - $default-branch
+      - develop
     tags:
-      - '*.*.*'
+      - "*.*.*"
   pull_request:
     branches:
-      - "main"
-      - "develop"
+      - $default-branch
+      - develop
+  schedule:
+    - cron: "0 8 * * *" # everyday at 8am
+
 jobs:
   ci:
-    runs-on: ubuntu-20.04
     strategy:
       matrix:
         include:
-          - tomcat_version: "9-jdk17-temurin-focal"
-            image_suffix: ""
           - tomcat_version: "10"
             image_suffix: "-tomcat-10"
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v3
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build and export to Docker
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./tomcat/Dockerfile
-          load: true
-          tags: tomcat-common
-          build-args: |
-            TOMCAT_VERSION=${{matrix.tomcat_version}}
-
-      - name: Run Trivy Vulnerability Scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'tomcat-common'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-
-      - name: Run Snyk to check Docker images for vulnerabilities
-        uses: snyk/actions/docker@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          image: tomcat-common
-          args: --severity-threshold=high
-
-      - name: Define Tags for Github Container Registry
-        id: docker-meta-ghcr
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            "ghcr.io/samply/tomcat-common"
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
-          flavor: |
-            suffix=${{matrix.image_suffix}}
-
-      - name: Login to Github Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push Image to Github Container Registry
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./tomcat/Dockerfile
-          push: true
-          platforms: "linux/amd64,linux/arm64/v8"
-          labels: ${{ steps.docker-meta-ghcr.outputs.labels }}
-          tags: ${{ steps.docker-meta-ghcr.outputs.tags }}
-          build-args: |
-            TOMCAT_VERSION=${{matrix.tomcat_version}}
-
-      - name: Define Tags for Docker Hub
-        id: docker-meta-dockerhub
-        uses: docker/metadata-action@v4
-        if: ${{ github.event_name != 'pull_request' }}
-        with:
-          images: |
-            "samply/tomcat-common"
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
-          flavor: |
-            suffix=${{matrix.image_suffix}}
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        if: ${{ github.event_name != 'pull_request' }}
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Push Image to Docker Hub
-        uses: docker/build-push-action@v4
-        if: ${{ github.event_name != 'pull_request' }}
-        with:
-          context: .
-          file: ./tomcat/Dockerfile
-          push: true
-          platforms: "linux/amd64,linux/arm64/v8"
-          labels: ${{ steps.docker-meta-dockerhub.outputs.labels }}
-          tags: ${{ steps.docker-meta-dockerhub.outputs.tags }}
-          build-args: |
-            TOMCAT_VERSION=${{matrix.tomcat_version}}
+          - tomcat_version: "11"
+            image_suffix: "-tomcat-11"
+    # This workflow defines how a samply docker image is built, tested and published.
+    # Visit: https://github.com/samply/github-workflows/blob/main/.github/workflows/docker-ci.yml, for more information
+    uses: samply/github-workflows/.github/workflows/docker-ci.yml@main
+    with:
+      # The Docker Hub Repository you want eventually push to, e.g samply/share-client
+      image-name: "samply/tomcat-common{{matrix.tomcat_version}}"
+      # Where to push your images ("dockerhub", "ghcr", "both" or "none")
+      push-to: dockerhub
+      # Define the Dockerfile of your image, typically default './Dockerfile' will be enough
+      build-file: "./tomcat/Dockerfile"
+      # A list of build arguments, passed to the docker build
+      build-args: |
+        TOMCAT_VERSION=${{matrix.tomcat_version}}
+      # Define the target platforms of the docker build (default "linux/amd64,linux/arm64/v8")
+      build-platforms: "linux/amd64"
+    # This passes the secrets from calling workflow to the called workflow
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
