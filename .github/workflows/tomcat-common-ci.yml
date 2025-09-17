@@ -3,6 +3,7 @@
 name: Build, Test and Deploy samply/tomcat-common
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 8 * * *' # everyday at 8am
   push:
