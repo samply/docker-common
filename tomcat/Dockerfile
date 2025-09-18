@@ -1,4 +1,5 @@
-ARG TOMCAT_VERSION="9-jdk17-temurin-focal"
+# You need to supply a TOMCAT_VERSION build argument, otherwise the build will fail
+ARG TOMCAT_VERSION
 FROM tomcat:$TOMCAT_VERSION
 
 ### Environment Variables need to be set at build time
