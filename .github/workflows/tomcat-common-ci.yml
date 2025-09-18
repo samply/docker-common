@@ -7,14 +7,10 @@ on:
     - cron: '0 8 * * *' # everyday at 8am
   push:
     branches:
-      - $default-branch
-      - develop
+      - main
     tags:
       - "*.*.*"
   pull_request:
-    branches:
-      - $default-branch
-      - develop
 
 jobs:
   ci:
