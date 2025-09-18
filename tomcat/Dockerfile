@@ -1,6 +1,7 @@
-ARG TOMCAT_VERSION="9-jdk17-temurin-focal"
+# You need to supply a TOMCAT_VERSION build argument, otherwise the build will fail
+ARG TOMCAT_VERSION
 FROM tomcat:$TOMCAT_VERSION
-MAINTAINER Torben Brenner "t.brenner@dkfz-heidelberg.de"
+
 ### Environment Variables need to be set at build time
 ### TODO: this needs to be done on build ...
 ONBUILD ARG COMPONENT="test"
@@ -15,9 +16,11 @@ ONBUILD ENV MANDATORY_VARIABLES=$MANDATORY_VARIABLES
 ADD ./tomcat/scripts/tomcat_entrypoint.sh ./tomcat/config/server.reverseproxy.patch ./tomcat/config/server.relaxedQueryChars.patch ./scripts/common_entrypoint.sh ./scripts/proxify.sh /docker/
 
 ### Run dos2unix to prevent issues from windows files
-RUN apt-get update -y && apt-get upgrade -y && apt-get install -y \
-	patch proxychains4 \
-	&& rm -rf /var/lib/apt/lists/*
+RUN --mount=type=cache,dst=/var/lib/apt/lists \
+    --mount=type=cache,dst=/var/cache \
+    --mount=type=cache,dst=/var/log \
+    apt-get update && \
+    apt-get install -y patch proxychains4
 
 RUN sed -i 's/^# localnet /localnet /;s/^socks.*$/http PROXYIP PROXYPORT/' /etc/proxychains4.conf
 
