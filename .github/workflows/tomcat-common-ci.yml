@@ -30,14 +30,14 @@ jobs:
       # The Docker Hub Repository you want eventually push to, e.g samply/share-client
       image-name: "samply/tomcat-common"
       # Define special prefixes for docker tags. They will prefix each images tag.
-      image-tag-prefix: "${{matrix.tomcat_version}}-"
+      image-tag-prefix: "${{ matrix.tomcat_version }}-"
       # Where to push your images ("dockerhub", "ghcr", "both" or "none")
       push-to: dockerhub
       # Define the Dockerfile of your image, typically default './Dockerfile' will be enough
       build-file: "./tomcat/Dockerfile"
       # A list of build arguments, passed to the docker build
       build-args: |
-        TOMCAT_VERSION=${{matrix.tomcat_version}}
+        TOMCAT_VERSION=${{ matrix.tomcat_version }}
       # Define the target platforms of the docker build (default "linux/amd64,linux/arm64/v8")
       #build-platforms: "linux/amd64,linux/arm64/v8"
     # This passes the secrets from calling workflow to the called workflow
