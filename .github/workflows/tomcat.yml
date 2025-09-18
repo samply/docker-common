@@ -1,5 +1,5 @@
-# This workflow represents the continuous integration pipeline for the samply/tomcat-common docker image
-name: Build, Test and Deploy samply/tomcat-common
+# This workflow represents the continuous integration pipeline for the common samply/tomcat docker image
+name: Build, Test and Deploy samply/tomcat
 
 on:
   workflow_dispatch:

@@ -1,13 +1,13 @@
 # Docker Common
-[![Build, Test and Deploy samply/tomcat-common](https://github.com/samply/docker-common/actions/workflows/tomcat-common-ci.yml/badge.svg)](https://github.com/samply/docker-common/actions/workflows/tomcat-common-ci.yml)
+[![Build, Test and Deploy samply/tomcat](https://github.com/samply/docker-common/actions/workflows/tomcat.yml/badge.svg)](https://github.com/samply/docker-common/actions/workflows/tomcat.yml)
 
 The main focus of this Project is to build base images for developers that handle common deployment tasks, e.g. environment variables for configuring tomcat for deployment behind a reverse proxy.
 
 ## Contents
 Currently, this repository provides implementation for following images:
-- [samply/tomcat-common](https://hub.docker.com/r/samply/tomcat-common)
+- [samply/tomcat](https://hub.docker.com/r/samply/tomcat)
 
-## Prequeresites
+## Prerequisites
 - [Docker Community Engine](https://docs.docker.com/engine/install/)
 
 ## Features
@@ -91,16 +91,16 @@ e.g. ```ENV EXAMPLE_PASSWORD=pleaseChangeMe```
 ## Usage
 This section provides examples on how to use the different images provided by this repository.
 
-### tomcat-common
+### samply/tomcat
 You can use it like this:
 ``` Dockerfile
-ARG TOMCAT_COMMON_VERSION=latest
+ARG TOMCAT_COMMON_VERSION=10-main
 FROM alpine:latest as extract
 RUN apk add --no-cache unzip
 ADD target/<YourPackageName>.war ./<YourPackageName>.war
 RUN mkdir -p /extracted && \
        unzip ./<YourPackageName> -d /extracted
-FROM samply/tomcat-common:${TOMCAT_COMMON_VERSION}
+FROM samply/tomcat:${TOMCAT_COMMON_VERSION}
 MAINTAINER <m.mustermann@example.com>
 ARG COMPONENT=example
 ENV COMPONENT=${COMPONENT}
@@ -119,9 +119,9 @@ docker build -t your-final-image --build-arg COMPONENT=example .
 ```
 
 The resulting image will only handle environment variables starting with the prefix "EXAMPLE_". 
-#### Additional features in samply/tomcat-common
+#### Additional features in samply/tomcat
 ##### Proxy Chain
-You can activate [proxychains](https://github.com/haad/proxychains) for the startup of the tomcat with 'samply/tomcat-common'. For this you need to set the environment variable `USE_PROXYCHAIN=true` and pass the proxy url via `HTTP_PROXY_URL`. The start script will generate the correct proxychains configuration at `/tmp/proxychains4.conf`. The usual processing of `HTTP_PROXY_URL` and other proxy variables will not happen.
+You can activate [proxychains](https://github.com/haad/proxychains) for the startup of the tomcat with 'samply/tomcat'. For this you need to set the environment variable `USE_PROXYCHAIN=true` and pass the proxy url via `HTTP_PROXY_URL`. The start script will generate the correct proxychains configuration at `/tmp/proxychains4.conf`. The usual processing of `HTTP_PROXY_URL` and other proxy variables will not happen.
 ## Known Issues
 For a list of currently known issues please refer to [Known Issues](https://github.com/samply/docker-common/issues)
 
