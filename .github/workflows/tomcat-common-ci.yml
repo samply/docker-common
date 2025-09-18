@@ -20,7 +20,7 @@ jobs:
           - tomcat_version: "10"
     uses: samply/github-workflows/.github/workflows/docker-ci.yml@v2
     with:
-      image-name: "samply/tomcat-common"
+      image-name: "samply/tomcat"
       image-tag-prefix: "${{ matrix.tomcat_version }}-"
       build-file: "./tomcat/Dockerfile"
       build-args: |
