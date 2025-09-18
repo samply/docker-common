@@ -16,9 +16,9 @@ ONBUILD ENV MANDATORY_VARIABLES=$MANDATORY_VARIABLES
 ADD ./tomcat/scripts/tomcat_entrypoint.sh ./tomcat/config/server.reverseproxy.patch ./tomcat/config/server.relaxedQueryChars.patch ./scripts/common_entrypoint.sh ./scripts/proxify.sh /docker/
 
 ### Run dos2unix to prevent issues from windows files
-RUN --mount=type=cache,dst=/var/lib/apt/lists \
-    --mount=type=cache,dst=/var/cache \
-    --mount=type=cache,dst=/var/log \
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    --mount=type=cache,target=/var/cache \
+    --mount=type=cache,target=/var/log \
     apt-get update && \
     apt-get install -y patch proxychains4
 
