@@ -39,7 +39,7 @@ jobs:
       build-args: |
         TOMCAT_VERSION=${{matrix.tomcat_version}}
       # Define the target platforms of the docker build (default "linux/amd64,linux/arm64/v8")
-      build-platforms: "linux/amd64"
+      #build-platforms: "linux/amd64,linux/arm64/v8"
     # This passes the secrets from calling workflow to the called workflow
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
