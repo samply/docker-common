@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - tomcat_version: "9-jdk8-temurin-noble"
+          - tomcat_version: "9-jdk17-temurin-noble"
           - tomcat_version: "10"
     uses: samply/github-workflows/.github/workflows/docker-ci.yml@main
     with:
