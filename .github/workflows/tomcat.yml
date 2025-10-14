@@ -4,7 +4,7 @@ name: Build, Test and Deploy samply/tomcat
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 8 * * *' # everyday at 8am
+    - cron: "0 8 * * *" # everyday at 8am
   push:
     branches:
       - main
@@ -17,6 +17,7 @@ jobs:
     strategy:
       matrix:
         include:
+          - tomcat_version: "9-jdk8-temurin-noble"
           - tomcat_version: "10"
     uses: samply/github-workflows/.github/workflows/docker-ci.yml@v2
     with:
