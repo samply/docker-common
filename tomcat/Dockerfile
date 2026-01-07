@@ -29,7 +29,8 @@ ONBUILD RUN set -x ; \
     adduser --disabled-password --ingroup www-data $COMPONENT; \
     chown -R $COMPONENT:www-data $CATALINA_HOME /docker/ /usr/local/share/ca-certificates/ $JAVA_HOME/lib/security/cacerts /etc/ssl/certs/ /run/secrets/; \
     mkdir /docker/custom-certs/; \
-    chmod -R 755 $CATALINA_HOME /docker/;
+    chmod -R 750 $CATALINA_HOME /docker/;
 
+RUN usermod -s /usr/sbin/nologin ubuntu
 ONBUILD USER $COMPONENT
 ENTRYPOINT ["/docker/tomcat_entrypoint.sh"]
