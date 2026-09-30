@@ -78,15 +78,22 @@ for templateFilename in $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/*; do
     echo "Info: Found template $templateFilename";
     filename="${templateFilename//.docker/}";
     echo "Info: Using template $templateFilename for file $filename";
-    for var in $(compgen -e | grep -i "$COMPONENT"); do
-      echo "Info: Updating value of environment variable $var";
-      sed -i "s|$var|${!var}|g" "$templateFilename";
-    done
+    # Backwards compatibility: resolve ${env:NAME} before the deprecated bare-name replacement below corrupts it
+    if grep -qF '${env:' "$templateFilename"; then
+      content=$(<"$templateFilename")
+      for name in $(compgen -e); do
+        placeholder="\${env:$name}"
+        content=${content//"$placeholder"/"${!name}"}
+      done
+      printf '%s\n' "$content" > "$templateFilename"
+    fi
     # common variables which are available for usage in every container
     common_vars="HTTP_PROXY_URL HTTP_PROXY_USERNAME HTTP_PROXY_PASSWORD HTTPS_PROXY_URL HTTPS_PROXY_USERNAME HTTPS_PROXY_PASSWORD NO_PROXY_HOSTS"
-    for var in $common_vars; do
-      echo "Info: Updating value of environment variable $var";
-      sed -i "s|$var|${!var}|g" "$templateFilename";
+    for var in $(compgen -e | grep -i "$COMPONENT") $common_vars; do
+      if sed 's/\${env:[^}]*}//g' "$templateFilename" | grep -qF "$var"; then
+        echo "Warning: $var in $templateFilename is deprecated, use \${env:$var} instead"
+        sed -i "s|$var|${!var}|g" "$templateFilename";
+      fi
     done
     cp -f "$templateFilename" "${filename}";
   fi

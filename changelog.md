@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## Unreleased
+## [0.8.0] - 2026-09-30
+### Added
+- Templates can contain `${env:NAME}`, which is replaced with the value of any environment variable `NAME`.
+### Deprecated
+- Bare variable names in templates now cause a warning at startup and will no longer be replaced in a future release. That release should only fail on names outside comments.
 ### Fixed
 - update server.xml patches due to the recent changes in server.xml file 
 ## [0.7.5] - 2023-04-13
