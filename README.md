@@ -23,15 +23,12 @@ The easiest way to define environment variables for this with docker.common is t
 e.g test.ui.docker.conf
 > Note: the .docker. marks a template file as template file. This is possible with all kinds of files e.g yml,xml,properties
 ```properties
-admin.user.name=ADMIN_USER_NAME
-admin.user.password=ADMIN_USER_PASSWORD
+admin.user.name=${env:ADMIN_USER_NAME}
+admin.user.password=${env:ADMIN_USER_PASSWORD}
 ```
-Then you now build an image with this repository you can use following environment variables on your image:
+On startup, every `${env:NAME}` is replaced with the value of the environment variable `NAME`. Placeholders for unset variables are left as they are.
 
-|ENVIRONMENT_VARIABLE|DEFAULT|
-|--------------------|-------|
-|ADMIN_USER_NAME|ADMIN_USER_NAME|
-|ADMIN_USER_PASSWORD|ADMIN_USER_PASSWORD|
+> Deprecated: Templates may also contain bare variable names, e.g. `admin.user.name=TEST_ADMIN_USER_NAME`. These are replaced for all variables whose name contains the component name (case-insensitive), and for the proxy variables listed below. Each bare name found causes a warning at startup. Bare names will no longer be replaced in a future release. Use `${env:NAME}` instead.
 
 ### Automatic Docker Secret Support
 Secrets passed to the container inside the "/run/secrets/" directory will automatically cause the entrypoint script to set the related environment variables value.
@@ -118,7 +115,7 @@ Assuming you placed the Dockerfile at the root of your repository (e.g. where yo
 docker build -t your-final-image --build-arg COMPONENT=example .
 ```
 
-The resulting image will only handle environment variables starting with the prefix "EXAMPLE_". 
+The resulting image replaces `${env:NAME}` for any environment variable, and the deprecated bare names for variables whose name contains "example" (case-insensitive). 
 #### Additional features in samply/tomcat
 ##### Proxy Chain
 You can activate [proxychains](https://github.com/haad/proxychains) for the startup of the tomcat with 'samply/tomcat'. For this you need to set the environment variable `USE_PROXYCHAIN=true` and pass the proxy url via `HTTP_PROXY_URL`. The start script will generate the correct proxychains configuration at `/tmp/proxychains4.conf`. The usual processing of `HTTP_PROXY_URL` and other proxy variables will not happen.
